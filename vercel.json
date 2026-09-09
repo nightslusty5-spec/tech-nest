@@ -1,59 +1,44 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
+      "source": "/api/:path*",
+      "destination": "/api/index.py"
     },
     {
-      "src": "frontend/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
+      "source": "/assets/:path*",
+      "destination": "/frontend/assets/:path*"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/frontend/assets/$1"
+      "source": "/css/:path*",
+      "destination": "/frontend/css/:path*"
     },
     {
-      "src": "/css/(.*)",
-      "dest": "/frontend/css/$1"
+      "source": "/js/:path*",
+      "destination": "/frontend/js/:path*"
     },
     {
-      "src": "/js/(.*)",
-      "dest": "/frontend/js/$1"
+      "source": "/checkout.html",
+      "destination": "/frontend/checkout.html"
     },
     {
-      "src": "/checkout.html",
-      "dest": "/frontend/checkout.html"
+      "source": "/checkout",
+      "destination": "/frontend/checkout.html"
     },
     {
-      "src": "/checkout",
-      "dest": "/frontend/checkout.html"
+      "source": "/success.html",
+      "destination": "/frontend/success.html"
     },
     {
-      "src": "/success.html",
-      "dest": "/frontend/success.html"
+      "source": "/success",
+      "destination": "/frontend/success.html"
     },
     {
-      "src": "/success",
-      "dest": "/frontend/success.html"
+      "source": "/product/:slug*",
+      "destination": "/frontend/index.html"
     },
     {
-      "src": "/product/(.*)",
-      "dest": "/frontend/index.html"
-    },
-    {
-      "src": "/",
-      "dest": "/frontend/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.py"
+      "source": "/",
+      "destination": "/frontend/index.html"
     }
   ]
 }
