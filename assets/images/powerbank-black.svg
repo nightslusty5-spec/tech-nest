@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgPB" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#09090b"/><stop offset="100%" stop-color="#18181b"/></linearGradient>
+    <linearGradient id="pbBody" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#27272a"/><stop offset="100%" stop-color="#18181b"/></linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#bgPB)"/>
+  <circle cx="300" cy="300" r="230" fill="#06b6d4" opacity="0.08"/>
+  <rect x="170" y="110" width="260" height="380" rx="28" fill="url(#pbBody)" stroke="#3f3f46" stroke-width="3"/>
+  <rect x="230" y="150" width="140" height="50" rx="12" fill="#09090b" stroke="#06b6d4" stroke-width="1.5"/>
+  <text x="300" y="183" fill="#06b6d4" font-family="monospace" font-size="26" font-weight="bold" text-anchor="middle">100%</text>
+  <text x="300" y="290" fill="#ffffff" font-family="sans-serif" font-size="28" font-weight="900" text-anchor="middle" letter-spacing="5">PULSE</text>
+  <text x="300" y="325" fill="#06b6d4" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle" letter-spacing="2">POWERMAX 20000mAh</text>
+  <text x="300" y="350" fill="#71717a" font-family="sans-serif" font-size="12" text-anchor="middle">22.5W Two-Way Fast Charge</text>
+  <rect x="210" y="430" width="40" height="20" rx="4" fill="#09090b" stroke="#f59e0b" stroke-width="1"/>
+  <rect x="280" y="430" width="40" height="20" rx="4" fill="#09090b" stroke="#06b6d4" stroke-width="1"/>
+  <rect x="350" y="430" width="40" height="20" rx="4" fill="#09090b" stroke="#f59e0b" stroke-width="1"/>
+</svg>

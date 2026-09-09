@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title id="seoPageTitle">Pulse Sonic Pro ANC True Wireless Earbuds | PULSE AUDIO</title>
+  <meta id="seoMetaDesc" name="description" content="Official PULSE AUDIO Store: 35dB Hybrid ANC Earbuds with 13mm Titanium Drivers, 40-hour monster battery, and 45ms gaming mode.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/product.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  
+  <!-- Dynamic OpenGraph & JSON-LD Container -->
+  <script type="application/ld+json" id="productSchemaJson"></script>
+  <!-- Meta Pixel SDK -->
+  <script src="/js/meta-pixel.js"></script>
+</head>
+<body class="light-theme">
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Top Announcement Promo Bar -->
+  <div class="top-announcement-bar">
+    <div class="container announcement-inner">
+      <div class="announcement-badge">⚡ META LAUNCH DEAL</div>
+      <span class="announcement-text">
+        Get Flat <strong>₹100 Instant Discount</strong> with code <code id="headerCouponCode">PREPAID100</code> | Free Express Delivery across India 🇮🇳
+      </span>
+    </div>
+  </div>
+
+  <!-- Compact Mobile-First Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <!-- Brand Logo -->
+      <a href="/" class="brand-logo" id="headerLogoLink">
+        <div class="logo-symbol">⚡</div>
+        <div class="logo-text">
+          <span class="brand-name">PULSE</span>
+          <span class="brand-sub">AUDIO</span>
+        </div>
+      </a>
+
+      <!-- Product Quick Switcher (For Multi-Product Meta Ads) -->
+      <div class="product-quick-nav">
+        <select id="productQuickSwitcher" class="product-switcher-select" aria-label="Switch Product">
+          <option value="pulse-sonic-pro" selected>🎧 Pulse Sonic Pro ANC Earbuds (₹1,499)</option>
+          <option value="pulse-hypercharge-33w">⚡ 33W GaN Dual Fast Charger (₹899)</option>
+          <option value="pulse-powermax-20k">🔋 20000mAh 22.5W Power Bank (₹1,699)</option>
+          <option value="pulse-armorcable-c">🔌 100W Braided Type-C Cable (₹399)</option>
+        </select>
+      </div>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <div class="header-trust-tag hide-mobile">
+          <span class="trust-icon">🛡️</span>
+          <span>1 Year Warranty</span>
+        </div>
+
+        <button class="cart-action-btn" id="headerCartBtn" aria-label="Shopping Cart">
+          <span class="cart-icon">🛒</span>
+          <span class="cart-count-badge" id="cartCountBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumb Bar (Desktop & Tablet) -->
+  <nav class="breadcrumb-container hide-mobile" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb-list">
+        <li><a href="/">Home</a></li>
+        <li class="sep">›</li>
+        <li><span id="breadcrumbCategory">Audio &amp; Wearables</span></li>
+        <li class="sep">›</li>
+        <li class="active" id="breadcrumbProductName">Pulse Sonic Pro ANC</li>
+      </ol>
+    </div>
+  </nav>
+
+  <!-- Main Product Landing Container -->
+  <main class="container product-main-container">
+    
+    <!-- Dynamic Skeleton Loader -->
+    <div id="productSkeleton" class="skeleton-layout" style="display: none;">
+      <div class="skeleton-gallery-box skeleton-pulse"></div>
+      <div class="skeleton-info-col">
+        <div class="skeleton-line title skeleton-pulse"></div>
+        <div class="skeleton-line sub skeleton-pulse"></div>
+        <div class="skeleton-line price skeleton-pulse"></div>
+        <div class="skeleton-line btn skeleton-pulse"></div>
+      </div>
+    </div>
+
+    <!-- Main Dynamic Product Grid -->
+    <div id="productMainGrid" class="product-main-grid">
+      
+      <!-- ================= LEFT COLUMN: INTERACTIVE GALLERY ================= -->
+      <div class="product-gallery-column">
+        <div class="gallery-sticky-wrapper">
+          
+          <!-- Gallery Viewport & Thumbnails -->
+          <div class="gallery-main-viewport-row">
+            
+            <!-- Desktop Vertical Thumbnails -->
+            <div class="thumbnail-strip hide-mobile" id="desktopThumbnails"></div>
+
+            <!-- Main Interactive Display -->
+            <div class="main-image-viewer" id="mainImageViewer">
+              <div class="bestseller-badge-pill" id="productBadgeTag">🔥 #1 BESTSELLER</div>
+              
+              <!-- Image element -->
+              <img id="mainProductImg" src="/assets/images/earbuds-black.svg" alt="Product Image" loading="eager">
+
+              <!-- Zoom hint for desktop -->
+              <div class="zoom-hint hide-mobile">
+                <span>🔍 Hover to zoom • Click to expand</span>
+              </div>
+
+              <!-- Fullscreen Button -->
+              <button class="btn-fullscreen-trigger" id="btnFullscreenModal" aria-label="View Fullscreen">
+                ⤢
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile Swipe Indicator Dots & Thumbnails -->
+          <div class="mobile-gallery-controls show-mobile">
+            <div class="carousel-dots-row" id="carouselDots"></div>
+            <div class="mobile-thumbs-scroll" id="mobileThumbsStrip"></div>
+          </div>
+
+          <!-- Desktop CTA Action Buttons -->
+          <div class="desktop-cta-actions hide-mobile">
+            <button class="btn-action btn-desktop-add-cart" id="desktopAddCartBtn">
+              <span class="btn-icon">🛒</span>
+              <span>ADD TO CART</span>
+            </button>
+            <button class="btn-action btn-desktop-buy-now" id="desktopBuyNowBtn">
+              <span class="btn-icon">⚡</span>
+              <span>BUY NOW</span>
+            </button>
+          </div>
+
+          <!-- Security Seals -->
+          <div class="trust-seals-grid">
+            <div class="seal-item">
+              <span class="seal-icon">🔒</span>
+              <span class="seal-text">256-Bit SSL Encrypted</span>
+            </div>
+            <div class="seal-item">
+              <span class="seal-icon">⚡</span>
+              <span class="seal-text">Razorpay Instant UPI</span>
+            </div>
+            <div class="seal-item">
+              <span class="seal-icon">🛡️</span>
+              <span class="seal-text">1-Year Doorstep Warranty</span>
+            </div>
+            <div class="seal-item">
+              <span class="seal-icon">🔄</span>
+              <span class="seal-text">7 Days Replacement</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ================= RIGHT COLUMN: DYNAMIC PRODUCT DETAILS ================= -->
+      <div class="product-info-column">
+        
+        <!-- Brand & Title Block -->
+        <div class="product-title-block">
+          <div class="brand-row">
+            <span class="brand-badge-pill" id="productBrand">PULSE AUDIO</span>
+            <span class="sku-tag" id="productSku">SKU: PA-TW3500-BLK</span>
+          </div>
+          <h1 class="product-title-heading" id="productName">Pulse Sonic Pro ANC True Wireless Earbuds</h1>
+          <p class="product-tagline" id="productTagline">35dB Hybrid ANC • 13mm Titanium Drivers • 40H Monster Battery • 45ms Gaming</p>
+        </div>
+
+        <!-- Rating Summary & Real-time Live Demand -->
+        <div class="rating-demand-row">
+          <div class="rating-pill-green">
+            <span id="productRatingVal">4.8</span>
+            <span class="star-char">★</span>
+          </div>
+          <span class="reviews-count-text" id="productReviewsCount">14,820 Verified Ratings</span>
+          <span class="verified-store-tag">✓ Verified Store</span>
+        </div>
+
+        <!-- Dynamic Stock Status Indicator -->
+        <div class="stock-status-banner" id="stockStatusBanner">
+          <span class="stock-indicator-dot"></span>
+          <span class="stock-message" id="stockMessage">✓ In Stock (28 units available)</span>
+        </div>
+
+        <!-- High-Impact Price Box -->
+        <div class="price-deal-card">
+          <div class="price-header-row">
+            <span class="price-currency">₹</span>
+            <span class="price-selling" id="displaySellingPrice">1,499</span>
+            <span class="price-mrp" id="displayMrpPrice">₹2,999</span>
+            <span class="price-discount-pill" id="displayDiscountBadge">50% OFF</span>
+          </div>
+          <div class="price-sub-info">
+            <span class="tax-note">Inclusive of all taxes</span>
+            <span class="bullet-sep">•</span>
+            <span class="shipping-note text-green">FREE Express Insured Delivery</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Offers & Copyable Coupons Section -->
+        <div class="offers-container">
+          <div class="offers-header">
+            <span class="icon">🏷️</span>
+            <strong>Available Offers &amp; Instant Coupons</strong>
+          </div>
+
+          <div class="offer-cards-list">
+            <!-- Coupon Card with Copy Action -->
+            <div class="coupon-item-card highlight">
+              <div class="coupon-left-col">
+                <div class="coupon-code-chip" id="couponChip">PREPAID100</div>
+                <p class="coupon-desc">Flat <strong>₹100 Instant Discount</strong> on prepaid orders (UPI / Cards). Applied automatically at checkout.</p>
+              </div>
+              <button class="btn-copy-coupon" id="btnCopyCoupon" data-coupon="PREPAID100" aria-label="Copy Coupon">
+                COPY
+              </button>
+            </div>
+
+            <!-- Bank Cashback Offer -->
+            <div class="coupon-item-card">
+              <div class="coupon-left-col">
+                <div class="bank-tag-chip">BANK OFFER</div>
+                <p class="coupon-desc">5% Unlimited Cashback on HDFC, Axis &amp; ICICI Bank Credit Cards.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Color / Variant Swatch Selector -->
+        <div class="variants-selection-section">
+          <div class="variants-header-row">
+            <span class="variant-heading">Select Color:</span>
+            <strong class="selected-variant-label" id="selectedVariantLabel">Midnight Obsidian (Matte Black)</strong>
+          </div>
+          
+          <div class="variant-swatches-grid" id="variantSwatchesGrid"></div>
+        </div>
+
+        <!-- Dynamic Quantity Stepper & Subtotal -->
+        <div class="quantity-stepper-section">
+          <div class="qty-header-row">
+            <span class="qty-heading">Quantity:</span>
+            <div class="qty-stepper-box">
+              <button class="btn-qty-step" id="btnQtyMinus" aria-label="Decrease quantity">−</button>
+              <input type="number" id="qtyInput" class="qty-input" value="1" min="1" max="10" readonly>
+              <button class="btn-qty-step" id="btnQtyPlus" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+          <div class="qty-subtotal-info">
+            <span>Item Subtotal:</span>
+            <strong class="subtotal-val" id="displayQtySubtotal">₹1,499</strong>
+          </div>
+          <div id="qtyStockWarning" class="qty-stock-warning" style="display: none;"></div>
+        </div>
+
+        <!-- Pincode Delivery Availability Checker -->
+        <div class="pincode-card">
+          <div class="pincode-title-row">
+            <span class="pin-icon">📍</span>
+            <span class="pin-title">Check Delivery Date &amp; COD Availability</span>
+          </div>
+          <div class="pincode-input-group">
+            <input type="text" id="pincodeInput" placeholder="Enter 6-digit PIN code (e.g. 110001, 560038)" maxlength="6">
+            <button class="btn-pincode-check" id="btnPincodeCheck">CHECK</button>
+          </div>
+          <div id="pincodeFeedback" class="pincode-feedback" style="display: none;"></div>
+        </div>
+
+        <!-- Key Feature Highlights Grid -->
+        <div class="feature-highlights-box">
+          <h3 class="highlights-heading">⚡ Key Highlights</h3>
+          <ul class="highlights-list" id="highlightsList"></ul>
+        </div>
+
+        <!-- Mobile-Friendly Collapsible Accordions -->
+        <div class="accordions-container">
+          
+          <!-- Accordion 1: Description -->
+          <div class="accordion-item" data-accordion="desc">
+            <button class="accordion-header" aria-expanded="true">
+              <span class="acc-title">📖 Product Overview &amp; Experience</span>
+              <span class="acc-icon">▾</span>
+            </button>
+            <div class="accordion-body active" id="accBodyDesc">
+              <p id="productFullDescription">Experience studio-grade acoustic clarity and deep cinematic bass...</p>
+            </div>
+          </div>
+
+          <!-- Accordion 2: Full Specifications -->
+          <div class="accordion-item" data-accordion="specs">
+            <button class="accordion-header" aria-expanded="false">
+              <span class="acc-title">📋 Full Technical Specifications</span>
+              <span class="acc-icon">▾</span>
+            </button>
+            <div class="accordion-body" id="accBodySpecs"></div>
+          </div>
+
+          <!-- Accordion 3: What's in the Box -->
+          <div class="accordion-item" data-accordion="box">
+            <button class="accordion-header" aria-expanded="false">
+              <span class="acc-title">📦 What's In The Box</span>
+              <span class="acc-icon">▾</span>
+            </button>
+            <div class="accordion-body" id="accBodyBox">
+              <ul class="box-contents-list" id="boxContentsList"></ul>
+            </div>
+          </div>
+
+          <!-- Accordion 4: Warranty & Guarantees -->
+          <div class="accordion-item" data-accordion="warranty">
+            <button class="accordion-header" aria-expanded="false">
+              <span class="acc-title">🛡️ 1-Year Doorstep Warranty &amp; Authenticity</span>
+              <span class="acc-icon">▾</span>
+            </button>
+            <div class="accordion-body" id="accBodyWarranty">
+              <p id="warrantyInfoText">1 Year Official Pulse Brand Replacement Warranty with Free Doorstep Pickup Support.</p>
+              <p class="warranty-sub">To register or claim warranty, simply scan the included card or email <strong>support@pulse-audio.in</strong>.</p>
+            </div>
+          </div>
+
+          <!-- Accordion 5: Frequently Asked Questions -->
+          <div class="accordion-item" data-accordion="faq">
+            <button class="accordion-header" aria-expanded="false">
+              <span class="acc-title">❓ Frequently Asked Questions</span>
+              <span class="acc-icon">▾</span>
+            </button>
+            <div class="accordion-body" id="accBodyFaq">
+              <div class="faq-list" id="faqList"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= VERIFIED CUSTOMER REVIEWS SECTION ================= -->
+    <section class="reviews-section" id="reviewsSection">
+      <div class="reviews-section-header">
+        <div>
+          <h2 class="reviews-main-title">Verified Customer Reviews</h2>
+          <p class="reviews-sub-title">100% Real purchases from customers across India</p>
+        </div>
+      </div>
+
+      <!-- Rating Breakdown Card -->
+      <div class="reviews-summary-card">
+        <div class="score-col">
+          <div class="big-score"><span id="reviewsScoreVal">4.8</span> <span class="star">★</span></div>
+          <p class="total-ratings-text" id="reviewsSummaryTotal">14,820 Ratings &amp; 3,240 Reviews</p>
+          <span class="recommend-tag">⚡ 96% of buyers recommend this product</span>
+        </div>
+
+        <div class="bars-col">
+          <div class="rating-bar-row"><span class="star-label">5 ★</span><div class="bar-bg"><div class="bar-fill" style="width:84%;"></div></div><span class="pct">84%</span></div>
+          <div class="rating-bar-row"><span class="star-label">4 ★</span><div class="bar-bg"><div class="bar-fill" style="width:11%;"></div></div><span class="pct">11%</span></div>
+          <div class="rating-bar-row"><span class="star-label">3 ★</span><div class="bar-bg"><div class="bar-fill" style="width:3%;"></div></div><span class="pct">3%</span></div>
+          <div class="rating-bar-row"><span class="star-label">2 ★</span><div class="bar-bg"><div class="bar-fill" style="width:1%;"></div></div><span class="pct">1%</span></div>
+          <div class="rating-bar-row"><span class="star-label">1 ★</span><div class="bar-bg"><div class="bar-fill" style="width:1%;"></div></div><span class="pct">1%</span></div>
+        </div>
+      </div>
+
+      <!-- Reviews Cards List -->
+      <div class="customer-reviews-grid" id="customerReviewsGrid"></div>
+    </section>
+
+  </main>
+
+  <!-- ================= STORE FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-col-brand">
+        <div class="brand-logo">
+          <div class="logo-symbol">⚡</div>
+          <div class="logo-text">
+            <span class="brand-name">PULSE</span>
+            <span class="brand-sub">AUDIO</span>
+          </div>
+        </div>
+        <p class="footer-desc">India's leading consumer audio &amp; smart gadget electronics brand. Engineered for high-fidelity acoustics, ultra-fast charging, and long-lasting durability.</p>
+        <div class="payment-badges-row">
+          <span class="badge-chip">UPI</span>
+          <span class="badge-chip">GPay</span>
+          <span class="badge-chip">PhonePe</span>
+          <span class="badge-chip">Paytm</span>
+          <span class="badge-chip">Visa</span>
+          <span class="badge-chip">Mastercard</span>
+          <span class="badge-chip">Razorpay</span>
+        </div>
+      </div>
+
+      <div class="footer-col-links">
+        <h4>Customer Care</h4>
+        <ul>
+          <li><a href="/checkout.html">Track Order</a></li>
+          <li><a href="#accBodyWarranty">1-Year Warranty Claim</a></li>
+          <li><a href="#">7-Day Replacement Terms</a></li>
+          <li><a href="#">Express Delivery Policy</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col-links">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About PULSE AUDIO</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Support Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-bar">
+      <div class="container footer-bottom-flex">
+        <p>© 2026 PULSE AUDIO Innovations Pvt Ltd. All Rights Reserved.</p>
+        <p class="sec-text">🔒 256-Bit SSL Encrypted &amp; Verified Indian Merchant</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= MOBILE STICKY BOTTOM PURCHASE BAR ================= -->
+  <div class="mobile-sticky-buy-bar" id="mobileStickyBar">
+    <div class="sticky-price-info">
+      <div class="sticky-price-row">
+        <span class="curr">₹</span>
+        <span class="val" id="stickyPriceVal">1,499</span>
+        <span class="mrp" id="stickyMrpVal">₹2,999</span>
+      </div>
+      <span class="shipping-tag">Free Express Shipping</span>
+    </div>
+    
+    <div class="sticky-buttons-row">
+      <button class="btn-sticky-add-cart" id="mobileStickyAddCartBtn" aria-label="Add to cart">
+        🛒
+      </button>
+      <button class="btn-sticky-buy-now" id="mobileStickyBuyBtn">
+        <span>⚡ BUY NOW</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= FULLSCREEN LIGHTBOX MODAL ================= -->
+  <div id="lightboxModal" class="lightbox-modal" style="display: none;">
+    <button class="btn-lightbox-close" id="btnLightboxClose" aria-label="Close Fullscreen">✕</button>
+    <div class="lightbox-content">
+      <img id="lightboxImg" src="" alt="Fullscreen Image">
+      <p id="lightboxCaption" class="lightbox-caption"></p>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

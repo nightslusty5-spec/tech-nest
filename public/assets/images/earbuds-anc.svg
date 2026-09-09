@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <rect width="800" height="800" fill="#0d1117" rx="24"/>
+  <circle cx="400" cy="400" r="260" fill="none" stroke="#21262d" stroke-width="2"/>
+  <circle cx="400" cy="370" r="150" fill="#161b22" stroke="#00d2ff" stroke-width="3"/>
+  <text x="400" y="390" font-family="sans-serif" font-size="50" font-weight="900" fill="#00d2ff" text-anchor="middle">35dB</text>
+  <text x="400" y="600" font-family="sans-serif" font-size="24" font-weight="800" fill="#fff" letter-spacing="2" text-anchor="middle">35dE HYBRID ANC</text>
+  <text x="400" y="640" font-family="sans-serif" font-size="15" fill="#8b949e" text-anchor="middle">Real-time Ambient Acoustic Phase Inversion</text>
+</svg>
