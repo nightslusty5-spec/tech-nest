@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed | PULSE AUDIO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/checkout.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <script src="/js/meta-pixel.js"></script>
+</head>
+<body class="light-theme success-page">
+
+  <header class="checkout-header">
+    <div class="container checkout-header-inner">
+      <a href="/" class="brand-logo">
+        <div class="logo-symbol">⚡</div>
+        <div class="logo-text">
+          <span class="brand-name">PULSE</span>
+          <span class="brand-sub">AUDIO</span>
+        </div>
+      </a>
+      <span class="order-placed-pill">✓ Payment Verified</span>
+    </div>
+  </header>
+
+  <main class="container success-container">
+    <div class="success-card">
+      <div class="success-animation-badge">
+        <div class="checkmark-circle">✓</div>
+      </div>
+      
+      <h1 class="success-title">Thank You For Your Order!</h1>
+      <p class="success-subtitle">Your order has been received and is being prepared for express dispatch.</p>
+
+      <div class="order-ref-pill">
+        <span>Order Reference Number:</span>
+        <strong id="orderIdDisplay">PULSE-ORD-LOADING</strong>
+      </div>
+
+      <!-- Order Tracking Stepper -->
+      <div class="tracking-stepper">
+        <div class="step-node active">
+          <div class="node-dot">✓</div>
+          <span class="node-label">Order Confirmed</span>
+        </div>
+        <div class="step-connector active"></div>
+        <div class="step-node active">
+          <div class="node-dot">⚡</div>
+          <span class="node-label">Payment Verified</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-node">
+          <div class="node-dot">📦</div>
+          <span class="node-label">Dispatched</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-node">
+          <div class="node-dot">🚚</div>
+          <span class="node-label">Out for Delivery</span>
+        </div>
+      </div>
+
+      <!-- Receipt Grid -->
+      <div class="receipt-card-grid">
+        <div class="receipt-section">
+          <h3>Customer Details</h3>
+          <p><strong id="orderCustName">Aditya Sharma</strong></p>
+          <p id="orderPhone">+91 9876543210</p>
+        </div>
+
+        <div class="receipt-section">
+          <h3>Shipping Address</h3>
+          <p id="orderAddress">Flat 402, Sunshine Heights, Bengaluru, Karnataka - 560038</p>
+        </div>
+
+        <div class="receipt-section">
+          <h3>Ordered Item</h3>
+          <p><strong id="orderProdName">Pulse Sonic Pro ANC Earbuds</strong></p>
+          <p id="orderVariant">Variant: Midnight Obsidian</p>
+        </div>
+
+        <div class="receipt-section">
+          <h3>Payment &amp; Delivery</h3>
+          <p>Amount Paid: <strong class="text-green" id="orderAmount">₹1,399</strong></p>
+          <p>Est. Delivery: <strong id="orderDeliveryEst">3-5 business days</strong></p>
+        </div>
+      </div>
+
+      <div class="warranty-card-box">
+        <span class="box-icon">🛡️</span>
+        <div>
+          <h4>1-Year Official Doorstep Warranty Activated</h4>
+          <p>Your electronic warranty card and GST tax invoice have been sent to your registered email address.</p>
+        </div>
+      </div>
+
+      <div class="success-actions-row">
+        <a href="/" class="btn-continue-shopping">← Return to Store</a>
+        <button class="btn-print-receipt" onclick="window.print()">🖨️ Print Invoice</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/success.js"></script>
+</body>
+</html>

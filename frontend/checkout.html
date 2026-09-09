@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Checkout | PULSE AUDIO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/checkout.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <script src="/js/meta-pixel.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body class="light-theme checkout-page">
+
+  <!-- Header -->
+  <header class="checkout-header">
+    <div class="container checkout-header-inner">
+      <a href="/" class="brand-logo">
+        <div class="logo-symbol">⚡</div>
+        <div class="logo-text">
+          <span class="brand-name">PULSE</span>
+          <span class="brand-sub">AUDIO</span>
+        </div>
+      </a>
+      <div class="checkout-security-tag">
+        <span class="lock-icon">🔒</span>
+        <span>100% Safe &amp; Secure Checkout</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Checkout Main Container -->
+  <main class="container checkout-container">
+    <div class="checkout-grid">
+      
+      <!-- Left Column: Shipping & Customer Details Form -->
+      <div class="checkout-form-column">
+        <div class="checkout-card">
+          <div class="checkout-card-header">
+            <span class="step-num">1</span>
+            <h2>Shipping &amp; Delivery Address</h2>
+          </div>
+
+          <form id="checkoutAddressForm" class="checkout-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="custName">Full Name <span class="req">*</span></label>
+                <input type="text" id="custName" placeholder="e.g. Aditya Sharma" required value="Aditya Sharma">
+              </div>
+            </div>
+
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label for="custPhone">Mobile Number (for delivery tracking) <span class="req">*</span></label>
+                <div class="phone-input-wrap">
+                  <span class="country-code">+91</span>
+                  <input type="tel" id="custPhone" placeholder="9876543210" maxlength="10" required value="9876543210">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="custEmail">Email Address (for invoice &amp; tracking) <span class="req">*</span></label>
+                <input type="email" id="custEmail" placeholder="aditya.sharma@example.com" required value="aditya.sharma@gmail.com">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="custAddress">Street Address / House No. / Building <span class="req">*</span></label>
+                <input type="text" id="custAddress" placeholder="Flat 402, Sunshine Heights, 100 Feet Ring Road" required value="Flat 402, Sunshine Heights, 100 Feet Ring Road">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="custApartment">Landmark / Area (Optional)</label>
+                <input type="text" id="custApartment" placeholder="Near Indiranagar Metro Station" value="Near Indiranagar Metro Station">
+              </div>
+            </div>
+
+            <div class="form-row three-col">
+              <div class="form-group">
+                <label for="custPincode">PIN Code <span class="req">*</span></label>
+                <input type="text" id="custPincode" placeholder="560038" maxlength="6" required value="560038">
+              </div>
+
+              <div class="form-group">
+                <label for="custCity">City / Town <span class="req">*</span></label>
+                <input type="text" id="custCity" placeholder="Bengaluru" required value="Bengaluru">
+              </div>
+
+              <div class="form-group">
+                <label for="custState">State <span class="req">*</span></label>
+                <select id="custState" required>
+                  <option value="Karnataka" selected>Karnataka</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Delhi">Delhi NCR</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="West Bengal">West Bengal</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Other">Other State</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Payment Option Preview -->
+            <div class="payment-method-selector">
+              <h3 class="selector-title">
+                <span class="step-num">2</span> Select Payment Method
+              </h3>
+              
+              <!-- Option 1: Prepaid Razorpay UPI (Recommended) -->
+              <div class="payment-card-option selected" id="optOnlineCard">
+                <div class="option-radio">
+                  <input type="radio" id="payOnline" name="paymentMethod" value="razorpay" checked>
+                  <label for="payOnline">
+                    <strong>Instant UPI / Cards / NetBanking</strong>
+                    <span class="option-badge">Recommended • ₹100 Off</span>
+                  </label>
+                </div>
+                <div class="payment-sub-logos">
+                  <span>⚡ GPay, PhonePe, Paytm, BHIM UPI, Credit/Debit Cards &amp; Netbanking</span>
+                </div>
+              </div>
+
+              <!-- Option 2: Cash on Delivery (With Area Error Message) -->
+              <div class="payment-card-option cod-card-option" id="optCodCard">
+                <div class="option-radio">
+                  <input type="radio" id="payCOD" name="paymentMethod" value="cod">
+                  <label for="payCOD">
+                    <strong>Cash on Delivery (COD)</strong>
+                    <span class="option-badge cod-badge">Unavailable</span>
+                  </label>
+                </div>
+                <div class="cod-unavailable-box" id="codErrorBanner" style="display: none;">
+                  <div class="cod-alert-header">
+                    <span class="cod-alert-icon">⚠️</span>
+                    <strong class="cod-alert-title">Cash on Delivery not available in your area</strong>
+                  </div>
+                  <p class="cod-alert-desc" id="codAlertDesc">
+                    Due to courier logistics restrictions, Cash on Delivery is currently disabled for your pincode. Please select <strong>Instant UPI / Online Payment</strong> to complete your order and claim an instant ₹100 discount.
+                  </p>
+                  <button type="button" class="btn-switch-online" id="btnSwitchOnline">
+                    ⚡ Pay via Instant UPI Instead (Save ₹100)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="submit-action-row">
+              <button type="submit" class="btn-proceed-pay" id="proceedPayBtn">
+                <span>🔒</span> PROCEED TO PAYMENT
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right Column: Dynamic Order Summary -->
+      <div class="checkout-summary-column">
+        <div class="summary-card-sticky">
+          <h3 class="summary-title">Order Summary</h3>
+
+          <div class="summary-product-row">
+            <div class="summary-img-box">
+              <img id="summaryProdImg" src="/assets/images/earbuds-black.svg" alt="Product Image">
+            </div>
+            <div class="summary-info">
+              <h4 class="prod-name" id="summaryProdName">Pulse Sonic Pro ANC True Wireless Earbuds</h4>
+              <p class="variant-tag" id="summaryVariantName">Variant: Midnight Obsidian</p>
+              <div class="qty-price-row">
+                <span class="qty-badge" id="summaryQtyBadge">Qty: 1</span>
+                <span class="price-strong" id="summaryUnitPrice">₹1,499</span>
+                <span class="mrp-striked" id="summaryUnitMrp">₹2,999</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coupon Card -->
+          <div class="applied-coupon-box">
+            <div class="coupon-left">
+              <span class="coupon-icon">🏷️</span>
+              <div>
+                <strong>PREPAID100</strong>
+                <p class="coupon-msg">₹100 instant prepaid discount applied</p>
+              </div>
+            </div>
+            <span class="coupon-tag-success">✓ APPLIED</span>
+          </div>
+
+          <!-- Price Calculation Rows -->
+          <div class="price-breakdown">
+            <div class="price-row">
+              <span>Item MRP:</span>
+              <span class="strike" id="summaryTotalMrp">₹2,999</span>
+            </div>
+            <div class="price-row">
+              <span>Special Selling Price:</span>
+              <span id="summarySubtotal">₹1,499</span>
+            </div>
+            <div class="price-row discount-row">
+              <span>Prepaid Discount (PREPAID100):</span>
+              <span id="summaryDiscount" class="text-green">-₹100</span>
+            </div>
+            <div class="price-row">
+              <span>Express Insured Shipping:</span>
+              <span class="text-green">FREE</span>
+            </div>
+            <div class="price-divider"></div>
+            <div class="price-row total-row">
+              <strong>Total Payable Amount:</strong>
+              <strong class="grand-total" id="summaryTotal">₹1,399</strong>
+            </div>
+          </div>
+
+          <!-- Guarantee badges -->
+          <div class="summary-trust-perks">
+            <div class="trust-perk">
+              <span class="icon">🛡️</span>
+              <span>1 Year Official Replacement Warranty</span>
+            </div>
+            <div class="trust-perk">
+              <span class="icon">🔄</span>
+              <span>7 Days Easy Replacement</span>
+            </div>
+            <div class="trust-perk">
+              <span class="icon">⚡</span>
+              <span>Instant Dispatch within 24 Hours</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/js/checkout.js"></script>
+</body>
+</html>

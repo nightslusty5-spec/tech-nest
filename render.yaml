@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: pulse-audio-ecommerce
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: STORE_BRAND
+        value: PULSE AUDIO
+      - key: RAZORPAY_KEY_ID
+        value: rzp_test_pulse_sandbox_key
+      - key: RAZORPAY_KEY_SECRET
+        value: pulse_secret_sandbox_signature_key
+      - key: META_PIXEL_ID
+        value: 102938475610293
