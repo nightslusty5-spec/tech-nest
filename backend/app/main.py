@@ -7,8 +7,12 @@ from backend.app.database import engine, Base
 from backend.app.services.seed_data import seed_database
 from backend.app.routes import products, checkout, orders
 
-Base.metadata.create_all(bind=engine)
-seed_database()
+# Initialize DB tables and seed catalogue
+try:
+    Base.metadata.create_all(bind=engine)
+    seed_database()
+except Exception as e:
+    print(f"Database initialization notice: {e}")
 
 app = FastAPI(
     title='PULSE AUDIO E-Commerce Store Engine',
@@ -28,25 +32,42 @@ app.include_router(products.router, prefix='/api')
 app.include_router(checkout.router, prefix='/api')
 app.include_router(orders.router, prefix='/api')
 
-frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'frontend')
-app.mount('/assets', StaticFiles(directory=os.path.join(frontend_dir, 'assets')), name='assets')
-app.mount('/css', StaticFiles(directory=os.path.join(frontend_dir, 'css')), name='css')
-app.mount('/js', StaticFiles(directory=os.path.join(frontend_dir, 'js')), name='js')
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+frontend_dir = os.path.join(BASE_DIR, 'frontend')
+
+if os.path.exists(os.path.join(frontend_dir, 'assets')):
+    app.mount('/assets', StaticFiles(directory=os.path.join(frontend_dir, 'assets')), name='assets')
+if os.path.exists(os.path.join(frontend_dir, 'css')):
+    app.mount('/css', StaticFiles(directory=os.path.join(frontend_dir, 'css')), name='css')
+if os.path.exists(os.path.join(frontend_dir, 'js')):
+    app.mount('/js', StaticFiles(directory=os.path.join(frontend_dir, 'js')), name='js')
 
 @app.get('/')
 def read_index():
-    return FileResponse(os.path.join(frontend_dir, 'index.html'))
+    index_file = os.path.join(frontend_dir, 'index.html')
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {'status': 'healthy', 'store': 'PULSE AUDIO'}
 
 @app.get('/product/{slug}')
 def read_product_page(slug: str):
-    return FileResponse(os.path.join(frontend_dir, 'index.html'))
+    index_file = os.path.join(frontend_dir, 'index.html')
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {'status': 'healthy', 'product': slug}
 
 @app.get('/checkout.html')
 @app.get('/checkout')
 def read_checkout():
-    return FileResponse(os.path.join(frontend_dir, 'checkout.html'))
+    checkout_file = os.path.join(frontend_dir, 'checkout.html')
+    if os.path.exists(checkout_file):
+        return FileResponse(checkout_file)
+    return {'status': 'checkout'}
 
 @app.get('/success.html')
 @app.get('/success')
 def read_success():
-    return FileResponse(os.path.join(frontend_dir, 'success.html'))
+    success_file = os.path.join(frontend_dir, 'success.html')
+    if os.path.exists(success_file):
+        return FileResponse(success_file)
+    return {'status': 'success'}
