@@ -13,8 +13,27 @@
   <link rel="stylesheet" href="/css/product.css">
   <link rel="stylesheet" href="/css/responsive.css">
   
-  <!-- Dynamic OpenGraph & JSON-LD Container -->
-  <script type="application/ld+json" id="productSchemaJson"></script>
+  <!-- Direct Checkout Navigation Helper -->
+  <script>
+    function goToCheckout(customSlug) {
+      try {
+        var urlParams = new URLSearchParams(window.location.search);
+        var pathParts = window.location.pathname.split('/').filter(Boolean);
+        var pathSlug = (pathParts[0] === 'product' && pathParts[1]) ? pathParts[1] : null;
+        var slug = customSlug || urlParams.get('product') || pathSlug || 'pulse-sonic-pro';
+        
+        var qtyEl = document.getElementById('qtyInput');
+        var qty = qtyEl ? (parseInt(qtyEl.value, 10) || 1) : 1;
+        
+        var activeCard = document.querySelector('.variant-swatch-card.active');
+        var variant = activeCard ? activeCard.getAttribute('data-variant-id') : 'midnight-obsidian';
+        
+        window.location.href = '/checkout.html?product=' + encodeURIComponent(slug) + '&variant=' + encodeURIComponent(variant || 'midnight-obsidian') + '&qty=' + qty;
+      } catch(err) {
+        window.location.href = '/checkout.html';
+      }
+    }
+  </script>
   <!-- Meta Pixel SDK -->
   <script src="/js/meta-pixel.js"></script>
 </head>
@@ -272,10 +291,10 @@
 
         <!-- Main Purchase CTA Buttons -->
         <div class="desktop-cta-actions">
-          <button class="btn-action btn-desktop-add-cart" id="desktopAddCartBtn" aria-label="Add to cart">
+          <button type="button" class="btn-action btn-desktop-add-cart" id="desktopAddCartBtn" aria-label="Add to cart">
             <span>🛒</span> ADD TO CART
           </button>
-          <button class="btn-action btn-desktop-buy-now" id="desktopBuyNowBtn" aria-label="Buy now">
+          <button type="button" class="btn-action btn-desktop-buy-now" id="desktopBuyNowBtn" aria-label="Buy now" onclick="goToCheckout()">
             <span>⚡</span> BUY NOW • PAY ONLINE
           </button>
         </div>
@@ -460,7 +479,7 @@
       <button class="btn-sticky-add-cart" id="mobileStickyAddCartBtn" aria-label="Add to cart">
         🛒
       </button>
-      <button class="btn-sticky-buy-now" id="mobileStickyBuyBtn">
+      <button type="button" class="btn-sticky-buy-now" id="mobileStickyBuyBtn" onclick="goToCheckout()">
         <span>⚡ BUY NOW</span>
       </button>
     </div>
