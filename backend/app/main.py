@@ -28,7 +28,10 @@ def ensure_db_ready():
 
 @app.on_event("startup")
 def on_startup():
-    ensure_db_ready()
+    try:
+        ensure_db_ready()
+    except Exception as e:
+        print(f"[Startup Warning] {e}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,20 +41,25 @@ app.add_middleware(
     allow_headers=['*']
 )
 
-# Pre-initialize DB for any incoming request
-@app.middleware("http")
-async def db_session_middleware(request, call_next):
-    ensure_db_ready()
-    response = await call_next(request)
-    return response
+@app.get('/api/health')
+def health_check():
+    return {'status': 'healthy', 'store': 'PULSE AUDIO', 'service': 'online'}
+
+from backend.app.config import settings
+
+@app.get('/api/checkout/payment-config')
+@app.get('/api/payment-config')
+def direct_payment_config():
+    return {
+        'upi_id': settings.PAYTM_UPI_ID,
+        'merchant_name': settings.PAYTM_MERCHANT_NAME,
+        'store_name': settings.STORE_BRAND,
+        'currency': 'INR'
+    }
 
 app.include_router(products.router, prefix='/api')
 app.include_router(checkout.router, prefix='/api')
 app.include_router(orders.router, prefix='/api')
-
-@app.get('/api/health')
-def health_check():
-    return {'status': 'healthy', 'store': 'PULSE AUDIO', 'service': 'online'}
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 frontend_dir = os.path.join(BASE_DIR, 'frontend')
