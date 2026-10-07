@@ -296,7 +296,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       })
       .then(function(orderData) {
-        openPaytmGateway(orderData);
+        fetch('/api/checkout/payment-config?t=' + Date.now())
+          .then(function(r) { return r.json(); })
+          .then(function(cfg) {
+            if (cfg && cfg.upi_id) paymentConfig = cfg;
+            openPaytmGateway(orderData);
+          })
+          .catch(function() {
+            openPaytmGateway(orderData);
+          });
       })
       .catch(function(err) {
         console.error(err);
@@ -307,19 +315,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Direct 1-Tap UPI Apps & Dynamic QR Gateway with Live UPI ID Customizer
+  // Direct 1-Tap UPI Apps & Dynamic QR Gateway Driven Exclusively by Vercel Environment Variables
   function openPaytmGateway(orderData) {
     var existingModal = document.getElementById('paytmModal');
     if (existingModal) existingModal.remove();
 
-    var upiId = localStorage.getItem('pulse_custom_upi_id') || paymentConfig.upi_id || 'paytm.pulse@paytm';
-    var merchant = paymentConfig.merchant_name || 'PULSE AUDIO Official';
+    var upiId = (paymentConfig && paymentConfig.upi_id) ? paymentConfig.upi_id : 'paytm.pulse@paytm';
+    var merchant = (paymentConfig && paymentConfig.merchant_name) ? paymentConfig.merchant_name : 'PULSE AUDIO Official';
     var amountFormatted = Number(orderData.amount).toFixed(2);
     var orderNum = orderData.order_number;
 
     function buildUpiLinks(targetUpiId) {
       var baseParams = 'pa=' + encodeURIComponent(targetUpiId) + 
                        '&pn=' + encodeURIComponent(merchant) + 
+                       '&mc=5732' + 
+                       '&mode=02' + 
+                       '&purpose=00' + 
                        '&am=' + amountFormatted + 
                        '&cu=INR&tn=' + encodeURIComponent('Order_' + orderNum);
       return {
@@ -344,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <span class="paytm-logo-badge">UPI</span>
             <div>
               <div class="paytm-brand-title">Direct 1-Tap UPI Payment</div>
-              <small style="opacity: 0.85; font-size: 11px;">Exact Amount Pre-filled • Zero Fees</small>
+              <small style="opacity: 0.85; font-size: 11px;">Exact Amount Pre-filled • Zero Transaction Fees</small>
             </div>
           </div>
           <div class="paytm-timer-pill" id="qrTimerPill">⏱️ 09:59</div>
@@ -396,20 +407,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <button type="button" class="btn-copy-upi" id="btnCopyUpiId">COPY</button>
           </div>
 
-          <!-- Instant Switch / Test UPI ID Toggle -->
-          <div style="margin-top: 10px; text-align: center;">
-            <button type="button" id="btnToggleCustomUpi" style="background: transparent; border: none; color: #0284c7; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline;">
-              ✏️ Test / Change Receiving UPI ID
-            </button>
-            <div id="customUpiBox" style="display: none; margin-top: 8px; background: #f8fafc; border: 1px dashed #94a3b8; border-radius: 8px; padding: 10px;">
-              <label style="font-size: 11px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px; text-align: left;">Enter any PhonePe / GPay / Paytm UPI ID:</label>
-              <div style="display: flex; gap: 6px;">
-                <input type="text" id="inputNewUpiId" value="${escapeHtml(upiId)}" placeholder="e.g. 9876543210@okaxis" style="flex: 1; height: 36px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 8px; font-size: 12px; font-weight: 700;">
-                <button type="button" id="btnApplyNewUpi" style="background: #0284c7; color: #fff; border: none; border-radius: 6px; padding: 0 12px; font-size: 12px; font-weight: 800; cursor: pointer;">APPLY</button>
-              </div>
-            </div>
-          </div>
-
           <!-- Section 3: Place Order Button -->
           <div style="margin-top: 14px;">
             <button type="button" id="btnIPaid" class="btn-i-paid" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); font-size: 14px; font-weight: 900; height: 52px;">
@@ -426,39 +423,6 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     `;
     document.body.appendChild(modal);
-
-    // Live UPI ID Switcher Logic
-    var toggleBtn = document.getElementById('btnToggleCustomUpi');
-    var customBox = document.getElementById('customUpiBox');
-    if (toggleBtn && customBox) {
-      toggleBtn.onclick = function() {
-        customBox.style.display = customBox.style.display === 'none' ? 'block' : 'none';
-      };
-    }
-
-    var applyBtn = document.getElementById('btnApplyNewUpi');
-    if (applyBtn) {
-      applyBtn.onclick = function() {
-        var inputVal = document.getElementById('inputNewUpiId').value.trim();
-        if (!inputVal || inputVal.indexOf('@') === -1) {
-          alert('Please enter a valid UPI ID containing @ (e.g. 9876543210@okaxis or yourname@ybl)');
-          return;
-        }
-        upiId = inputVal;
-        localStorage.setItem('pulse_custom_upi_id', inputVal);
-        links = buildUpiLinks(inputVal);
-
-        // Update UI
-        document.getElementById('merchantUpiVal').textContent = inputVal;
-        document.getElementById('dynamicQrImgTag').src = links.qr;
-        document.getElementById('btnGPayDirect').href = links.gpay;
-        document.getElementById('btnPhonePeDirect').href = links.phonepe;
-        document.getElementById('btnPaytmDirect').href = links.paytm;
-
-        customBox.style.display = 'none';
-        alert('✓ Updated! Receiving UPI ID is now set to: ' + inputVal);
-      };
-    }
 
     // Copy UPI ID button
     document.getElementById('btnCopyUpiId').onclick = function() {
