@@ -41,6 +41,17 @@ app.add_middleware(
     allow_headers=['*']
 )
 
+@app.middleware("http")
+async def vercel_rewrite_middleware(request, call_next):
+    path_param = request.query_params.get("path") or request.query_params.get("path*")
+    if path_param and (request.url.path in ["/api/index.py", "/api/index", "/api", "/", "/index.py"]):
+        target = "/" + path_param.lstrip("/")
+        if not target.startswith("/api"):
+            target = "/api" + target
+        request.scope["path"] = target
+    response = await call_next(request)
+    return response
+
 @app.get('/api/health')
 @app.get('/health')
 def health_check():
