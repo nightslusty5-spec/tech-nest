@@ -79,3 +79,16 @@ class VerifyUpiRequest(BaseModel):
     order_number: str
     utr_number: str
     payment_method: Optional[str] = 'paytm_upi'
+
+class AutoVerifyPaymentRequest(BaseModel):
+    order_number: str
+    payment_method: Optional[str] = 'paytm_upi'
+
+class OrderStatusResponse(BaseModel):
+    order_number: str
+    payment_status: str
+    order_status: str
+    amount: float
+    product_name: str
+    is_paid: bool
+

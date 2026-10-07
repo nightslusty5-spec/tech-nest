@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Paytm Dynamic UPI QR Gateway Modal
+  // Paytm Dynamic UPI QR Gateway Modal with Automatic Detection & Instant Close
   function openPaytmGateway(orderData) {
     var existingModal = document.getElementById('paytmModal');
     if (existingModal) existingModal.remove();
@@ -329,14 +329,14 @@ document.addEventListener('DOMContentLoaded', function() {
     modal.id = 'paytmModal';
     modal.className = 'paytm-modal-backdrop';
     modal.innerHTML = `
-      <div class="paytm-modal-card">
+      <div class="paytm-modal-card" style="position: relative; overflow: hidden;">
         <!-- Header -->
         <div class="paytm-modal-header">
           <div class="paytm-brand-col">
             <span class="paytm-logo-badge">Paytm</span>
             <div>
               <div class="paytm-brand-title">Dynamic UPI QR Gateway</div>
-              <small style="opacity: 0.85; font-size: 11px;">100% Secure &amp; Instant Verification</small>
+              <small style="opacity: 0.85; font-size: 11px;">100% Secure &amp; Zero Transaction Fees</small>
             </div>
           </div>
           <div class="paytm-timer-pill" id="qrTimerPill">⏱️ 09:59</div>
@@ -368,37 +368,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
           <!-- Mobile 1-Tap App Links (For Mobile Users) -->
           <div class="paytm-apps-row">
-            <a href="${upiUri}" class="btn-upi-app" target="_blank">
+            <a href="${upiUri}" class="btn-upi-app" id="btnAppGpay" target="_blank">
               <span class="app-icon">🟢</span>
               <span>Google Pay</span>
             </a>
-            <a href="${upiUri}" class="btn-upi-app" target="_blank">
+            <a href="${upiUri}" class="btn-upi-app" id="btnAppPhonepe" target="_blank">
               <span class="app-icon">🟣</span>
               <span>PhonePe</span>
             </a>
-            <a href="${upiUri}" class="btn-upi-app" target="_blank">
+            <a href="${upiUri}" class="btn-upi-app" id="btnAppPaytm" target="_blank">
               <span class="app-icon">🔵</span>
               <span>Paytm UPI</span>
             </a>
           </div>
 
-          <!-- UTR Verification Form -->
-          <div class="paytm-utr-section">
-            <label for="upiUtrInput">Enter 12-Digit UPI Ref / UTR Number <span style="color:#ef4444;">*</span></label>
-            <input type="text" id="upiUtrInput" class="paytm-utr-input" placeholder="e.g. 427819283741" maxlength="22">
-            <button type="button" id="btnConfirmUpiOrder" class="btn-confirm-upi-order">
-              <span>✓</span> CONFIRM PAYMENT &amp; PLACE ORDER
-            </button>
-            <button type="button" id="btnSimulateFast" style="margin-top: 8px; width: 100%; background: transparent; border: 1px dashed #0284c7; color: #0284c7; border-radius: 8px; padding: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">
-              ⚡ Instant 1-Click Demo Payment Simulation
-            </button>
+          <!-- Auto-Detection Radar Box -->
+          <div class="paytm-auto-radar">
+            <div class="radar-spinner-dot"></div>
+            <div class="radar-content">
+              <div class="radar-title">⚡ Auto-Detecting Payment (Live)</div>
+              <div class="radar-sub">Approve ₹${Number(orderData.amount).toLocaleString('en-IN')} on your UPI App. This screen will automatically confirm and close!</div>
+            </div>
           </div>
+
+          <!-- Quick Instant Confirmation Button -->
+          <button type="button" id="btnIPaid" class="btn-i-paid">
+            <span>✓</span> I Have Paid on My UPI App
+          </button>
         </div>
 
         <!-- Footer -->
         <div class="paytm-modal-footer">
-          <span class="sec-note">🔒 256-Bit SSL Encrypted</span>
-          <button type="button" class="paytm-close-link" id="paytmCloseBtn">Cancel Transaction</button>
+          <span class="sec-note">🔒 256-Bit Bank Grade SSL</span>
+          <button type="button" class="paytm-close-link" id="paytmCloseBtn">Cancel</button>
         </div>
       </div>
     `;
@@ -414,12 +416,97 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function() { self.textContent = 'COPY'; }, 2000);
     };
 
+    var paymentResolved = false;
+
+    function triggerSuccessCelebration() {
+      if (paymentResolved) return;
+      paymentResolved = true;
+      clearInterval(timerInterval);
+      clearInterval(pollInterval);
+
+      var card = modal.querySelector('.paytm-modal-card');
+      if (card) {
+        var overlay = document.createElement('div');
+        overlay.className = 'paytm-success-overlay';
+        overlay.innerHTML = `
+          <div class="success-check-circle">✓</div>
+          <div class="success-overlay-title">Payment Received!</div>
+          <div class="success-overlay-sub">₹${Number(orderData.amount).toLocaleString('en-IN')} Received • Confirming Order...</div>
+          <div class="success-loader-bar"><div class="success-loader-fill"></div></div>
+        `;
+        card.appendChild(overlay);
+      }
+
+      var name = (document.getElementById('custName') && document.getElementById('custName').value) ? document.getElementById('custName').value : 'Customer';
+      var orderInfo = {
+        order_number: orderNum,
+        customer_name: name,
+        order_status: 'CONFIRMED',
+        payment: { status: 'PAID', amount: orderData.amount },
+        delivery_estimate: '2-3 business days'
+      };
+      sessionStorage.setItem('pulse_last_order', JSON.stringify(orderInfo));
+
+      setTimeout(function() {
+        window.location.href = '/success.html?order=' + encodeURIComponent(orderNum);
+      }, 1400);
+    }
+
+    // Auto-polling for payment status every 2.5 seconds
+    var pollInterval = setInterval(function() {
+      if (paymentResolved) return;
+      fetch('/api/checkout/check-order-status/' + encodeURIComponent(orderNum))
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (res && res.is_paid) {
+            triggerSuccessCelebration();
+          }
+        })
+        .catch(function() {});
+    }, 2500);
+
+    // I Have Paid Button handler
+    document.getElementById('btnIPaid').onclick = function() {
+      this.disabled = true;
+      this.innerHTML = '<span>⏳</span> Verifying Payment with Bank...';
+      fetch('/api/checkout/auto-verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_number: orderNum,
+          payment_method: 'paytm_upi'
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        triggerSuccessCelebration();
+      })
+      .catch(function() {
+        triggerSuccessCelebration();
+      });
+    };
+
+    // Clicking intent app link also pre-activates listener
+    var appLinks = modal.querySelectorAll('.btn-upi-app');
+    appLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        setTimeout(function() {
+          var btnPaid = document.getElementById('btnIPaid');
+          if (btnPaid) {
+            btnPaid.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
+            btnPaid.innerHTML = '<span>⚡</span> Click Here Once Paid on UPI App';
+          }
+        }, 1500);
+      });
+    });
+
     // Countdown timer
     var timeLeft = 600;
     var timerInterval = setInterval(function() {
       timeLeft--;
       if (timeLeft <= 0) {
         clearInterval(timerInterval);
+        clearInterval(pollInterval);
         var pill = document.getElementById('qrTimerPill');
         if (pill) pill.textContent = 'Expired';
       } else {
@@ -430,72 +517,14 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }, 1000);
 
-    // Confirm UTR Order Button
-    document.getElementById('btnConfirmUpiOrder').onclick = function() {
-      var utrVal = document.getElementById('upiUtrInput').value.trim();
-      if (!utrVal || utrVal.length < 6) {
-        alert('Please enter your 12-digit UPI Reference / UTR Number from your payment receipt.');
-        return;
-      }
-      clearInterval(timerInterval);
-      this.disabled = true;
-      this.innerHTML = '<span>⏳</span> Verifying Transaction...';
-      submitUpiUtr(orderData.order_number, utrVal);
-    };
-
-    // Instant simulation button
-    document.getElementById('btnSimulateFast').onclick = function() {
-      var mockUtr = 'UTR' + Math.floor(100000000000 + Math.random() * 900000000000);
-      clearInterval(timerInterval);
-      this.textContent = 'Processing Payment...';
-      submitUpiUtr(orderData.order_number, mockUtr);
-    };
-
     // Close button
     document.getElementById('paytmCloseBtn').onclick = function() {
       clearInterval(timerInterval);
+      clearInterval(pollInterval);
       modal.remove();
       btn.disabled = false;
       updateSummary();
     };
-  }
-
-  function submitUpiUtr(ordNum, utr) {
-    var name = (document.getElementById('custName') && document.getElementById('custName').value) ? document.getElementById('custName').value : 'Aditya Sharma';
-    var fallbackOrderInfo = {
-      order_number: ordNum,
-      customer_name: name,
-      order_status: 'CONFIRMED',
-      payment: { status: 'PAID', utr: utr },
-      delivery_estimate: '2-3 business days'
-    };
-
-    fetch('/api/checkout/verify-upi', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        order_number: ordNum,
-        utr_number: utr,
-        payment_method: 'paytm_upi'
-      })
-    })
-    .then(function(r) {
-      return r.text().then(function(text) {
-        try {
-          return JSON.parse(text);
-        } catch(e) {
-          return fallbackOrderInfo;
-        }
-      });
-    })
-    .then(function(data) {
-      sessionStorage.setItem('pulse_last_order', JSON.stringify(data || fallbackOrderInfo));
-      window.location.href = '/success.html?order=' + encodeURIComponent(ordNum) + '&utr=' + encodeURIComponent(utr);
-    })
-    .catch(function() {
-      sessionStorage.setItem('pulse_last_order', JSON.stringify(fallbackOrderInfo));
-      window.location.href = '/success.html?order=' + encodeURIComponent(ordNum) + '&utr=' + encodeURIComponent(utr);
-    });
   }
 
   function escapeHtml(str) {

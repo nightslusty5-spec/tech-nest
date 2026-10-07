@@ -119,16 +119,29 @@ print(f'Order created: {order_res["order_number"]} | Amount: INR {order_res["amo
 assert order_res['amount'] == 2.0
 
 
-print('\n=== 4. Testing Paytm Dynamic UPI UTR Verification & CAPI Trigger ===')
-upi_verify_payload = {
+print('\n=== 4. Testing Paytm Dynamic UPI Auto-Verification & CAPI Trigger ===')
+# Test initial pending status
+r_stat = client.get(f'/api/checkout/check-order-status/{order_res["order_number"]}')
+assert r_stat.status_code == 200
+assert r_stat.json()['is_paid'] == False
+print(f'Order initial status check: is_paid={r_stat.json()["is_paid"]} (PENDING)')
+
+# Test auto-verify payment endpoint
+auto_verify_payload = {
     'order_number': order_res['order_number'],
-    'utr_number': '123456789012'
+    'payment_method': 'paytm_upi'
 }
-r = client.post('/api/checkout/verify-upi', json=upi_verify_payload)
-assert r.status_code == 200, f'Verify UPI failed: {r.text}'
+r = client.post('/api/checkout/auto-verify-payment', json=auto_verify_payload)
+assert r.status_code == 200, f'Auto verify payment failed: {r.text}'
 ver_res = r.json()
-print(f'Payment verified: status={ver_res["order_status"]} | estimate={ver_res["delivery_estimate"]}')
+print(f'Payment auto-verified: status={ver_res["order_status"]} | estimate={ver_res["delivery_estimate"]}')
 assert ver_res['order_status'] == 'CONFIRMED'
+
+# Test status polling after verification
+r_stat_after = client.get(f'/api/checkout/check-order-status/{order_res["order_number"]}')
+assert r_stat_after.status_code == 200
+assert r_stat_after.json()['is_paid'] == True
+print(f'Order status check after auto-verify: is_paid={r_stat_after.json()["is_paid"]} (PAID / CONFIRMED)')
 
 
 print('\n=== 5. Testing Order Detail Retrieval API ===')

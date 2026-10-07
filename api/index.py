@@ -40,7 +40,7 @@ def direct_payment_cfg():
 # Catch-all route to handle any rewrite variant
 @app.api_route("/{full_path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 async def catch_all_router(request: Request, full_path: str):
-    if "payment" in full_path or "config" in full_path:
+    if "payment-config" in full_path or "payment_config" in full_path:
         return get_upi_config_data()
     
     # Try delegating to backend routes
