@@ -9,13 +9,13 @@ document.addEventListener('DOMContentLoaded', function() {
     productName: 'Pulse Sonic Pro ANC True Wireless Earbuds',
     variantId: urlParams.get('variant') || 'midnight-obsidian',
     quantity: parseInt(urlParams.get('qty') || '1', 10),
-    price: 1499.0,
+    price: 1.0,
     mrp: 2999.0,
     eventId: 'ic_' + Date.now()
   };
 
   var appliedCoupon = 'PREPAID100';
-  var couponDiscount = 100.0;
+  var couponDiscount = 0.0;
 
   var paymentConfig = {
     upi_id: 'paytm.pulse@paytm',

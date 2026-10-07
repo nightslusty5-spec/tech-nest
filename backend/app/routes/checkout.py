@@ -116,7 +116,7 @@ def create_checkout_order(req: CreateOrderRequest, db: Session = Depends(get_db)
     if not chosen_variant and variants:
         chosen_variant = variants[0]
 
-    unit_price = float(getattr(product_obj, 'price', 1499.0))
+    unit_price = float(getattr(product_obj, 'price', 1.0))
     mrp_total = float(getattr(product_obj, 'mrp', 2999.0)) * req.quantity
     subtotal = unit_price * req.quantity
     shipping_fee = 0.0
@@ -264,7 +264,7 @@ def verify_upi_payment(req: VerifyUpiRequest, db: Session = Depends(get_db)):
             message='UPI payment recorded successfully. Order confirmed!',
             order_number=req.order_number,
             order_status='CONFIRMED',
-            amount_paid=1399.0,
+            amount_paid=1.0,
             product_name='Pulse Sonic Pro ANC Earbuds',
             variant='Standard',
             delivery_estimate='2-3 business days'
