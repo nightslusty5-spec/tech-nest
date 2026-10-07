@@ -24,14 +24,29 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Fetch dynamic payment config from backend
-  fetch('/api/checkout/payment-config')
-    .then(function(r) { return r.json(); })
-    .then(function(cfg) {
-      if (cfg && cfg.upi_id) {
-        paymentConfig = cfg;
-      }
-    })
-    .catch(function() {});
+  function loadPaymentConfig() {
+    fetch('/api/checkout/payment-config')
+      .then(function(r) {
+        if (!r.ok) throw new Error('status ' + r.status);
+        return r.json();
+      })
+      .then(function(cfg) {
+        if (cfg && cfg.upi_id) {
+          paymentConfig = cfg;
+        }
+      })
+      .catch(function() {
+        fetch('/api/payment_config')
+          .then(function(r) { return r.json(); })
+          .then(function(cfg) {
+            if (cfg && cfg.upi_id) {
+              paymentConfig = cfg;
+            }
+          })
+          .catch(function() {});
+      });
+  }
+  loadPaymentConfig();
 
   // If slug was passed in URL, fetch dynamic product details to sync price
   var slugFromUrl = urlParams.get('product') || checkoutState.productSlug;
