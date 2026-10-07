@@ -42,6 +42,7 @@ app.add_middleware(
 )
 
 @app.get('/api/health')
+@app.get('/health')
 def health_check():
     return {'status': 'healthy', 'store': 'PULSE AUDIO', 'service': 'online'}
 
@@ -49,6 +50,9 @@ from backend.app.config import settings
 
 @app.get('/api/checkout/payment-config')
 @app.get('/api/payment-config')
+@app.get('/checkout/payment-config')
+@app.get('/payment-config')
+@app.get('/payment_config')
 def direct_payment_config():
     return {
         'upi_id': settings.PAYTM_UPI_ID,
@@ -60,6 +64,10 @@ def direct_payment_config():
 app.include_router(products.router, prefix='/api')
 app.include_router(checkout.router, prefix='/api')
 app.include_router(orders.router, prefix='/api')
+
+app.include_router(products.router)
+app.include_router(checkout.router)
+app.include_router(orders.router)
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 frontend_dir = os.path.join(BASE_DIR, 'frontend')
