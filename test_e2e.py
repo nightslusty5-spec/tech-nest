@@ -120,28 +120,37 @@ assert order_res['amount'] == 2.0
 
 
 print('\n=== 4. Testing Paytm Dynamic UPI Auto-Verification & CAPI Trigger ===')
-# Test initial pending status
+# 1. Test initial pending status
 r_stat = client.get(f'/api/checkout/check-order-status/{order_res["order_number"]}')
 assert r_stat.status_code == 200
 assert r_stat.json()['is_paid'] == False
 print(f'Order initial status check: is_paid={r_stat.json()["is_paid"]} (PENDING)')
 
-# Test auto-verify payment endpoint
+# 2. Test rejection when user clicks without real bank payment
 auto_verify_payload = {
     'order_number': order_res['order_number'],
     'payment_method': 'paytm_upi'
 }
-r = client.post('/api/checkout/auto-verify-payment', json=auto_verify_payload)
-assert r.status_code == 200, f'Auto verify payment failed: {r.text}'
-ver_res = r.json()
-print(f'Payment auto-verified: status={ver_res["order_status"]} | estimate={ver_res["delivery_estimate"]}')
-assert ver_res['order_status'] == 'CONFIRMED'
+r_unpaid = client.post('/api/checkout/auto-verify-payment', json=auto_verify_payload)
+assert r_unpaid.status_code == 400
+assert 'Payment Not Detected Yet' in r_unpaid.json()['detail']
+print('Unpaid Order Rejection Test: SUCCESS (400 returned with "Payment Not Detected Yet")')
 
-# Test status polling after verification
+# 3. Simulate Paytm Webhook Credit Callback
+wh_payload = {
+    'ORDERID': order_res['order_number'],
+    'STATUS': 'TXN_SUCCESS',
+    'TXNID': 'PTM_TXN_' + order_res['order_number']
+}
+r_wh = client.post('/api/checkout/paytm-webhook', json=wh_payload)
+assert r_wh.status_code == 200
+print(f'Paytm Webhook Received: {r_wh.json()}')
+
+# 4. Test status polling after credit verification
 r_stat_after = client.get(f'/api/checkout/check-order-status/{order_res["order_number"]}')
 assert r_stat_after.status_code == 200
 assert r_stat_after.json()['is_paid'] == True
-print(f'Order status check after auto-verify: is_paid={r_stat_after.json()["is_paid"]} (PAID / CONFIRMED)')
+print(f'Order status check after webhook credit: is_paid={r_stat_after.json()["is_paid"]} (PAID / CONFIRMED)')
 
 
 print('\n=== 5. Testing Order Detail Retrieval API ===')

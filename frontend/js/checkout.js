@@ -467,8 +467,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // I Have Paid Button handler
     document.getElementById('btnIPaid').onclick = function() {
-      this.disabled = true;
-      this.innerHTML = '<span>⏳</span> Verifying Payment with Bank...';
+      var self = this;
+      self.disabled = true;
+      self.innerHTML = '<span>⏳</span> Checking Bank Confirmation...';
       fetch('/api/checkout/auto-verify-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -477,12 +478,21 @@ document.addEventListener('DOMContentLoaded', function() {
           payment_method: 'paytm_upi'
         })
       })
-      .then(function(r) { return r.json(); })
+      .then(function(r) {
+        return r.json().then(function(res) {
+          if (!r.ok) {
+            throw new Error(res.detail || 'Payment not yet detected in your Paytm account.');
+          }
+          return res;
+        });
+      })
       .then(function(res) {
         triggerSuccessCelebration();
       })
-      .catch(function() {
-        triggerSuccessCelebration();
+      .catch(function(err) {
+        self.disabled = false;
+        self.innerHTML = '<span>⚡</span> Check Payment Status Again';
+        alert('⚠️ ' + (err.message || 'Payment not yet detected in the merchant Paytm account. Please approve the payment on Google Pay, PhonePe, or Paytm and try again.'));
       });
     };
 

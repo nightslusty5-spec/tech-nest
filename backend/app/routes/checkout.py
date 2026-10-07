@@ -259,11 +259,13 @@ def get_payment_config():
         currency='INR'
     )
 
+from backend.app.services.paytm_service import paytm_service
+from fastapi import Request
+
 @router.get('/check-order-status/{order_number}', response_model=OrderStatusResponse)
 def check_order_status(order_number: str, db: Session = Depends(get_db)):
     order = db.query(Order).filter(Order.order_number == order_number).first()
     if not order:
-        # Default status for serverless stateless lookup
         return OrderStatusResponse(
             order_number=order_number,
             payment_status='PENDING_PAYMENT',
@@ -272,6 +274,25 @@ def check_order_status(order_number: str, db: Session = Depends(get_db)):
             product_name='Pulse Sonic Pro ANC Earbuds',
             is_paid=False
         )
+
+    # Query Paytm Merchant Ledger if not paid yet
+    if order.payment_status != 'PAID':
+        paytm_res = paytm_service.check_order_transaction_status(order_number)
+        if paytm_res.get('is_paid'):
+            order.payment_status = 'PAID'
+            order.order_status = 'CONFIRMED'
+            order.upi_utr = paytm_res.get('txn_id', '')
+            db.commit()
+            try:
+                meta_capi.send_event(
+                    event_name='Purchase',
+                    event_id=order.event_id or f'pur_{order.order_number}',
+                    user_data={'email': order.email, 'phone': order.phone, 'first_name': order.customer_name.split()[0] if order.customer_name else '', 'city': order.city, 'state': order.state, 'pincode': order.pincode},
+                    custom_data={'currency': 'INR', 'value': order.total_amount, 'order_id': order.order_number, 'content_name': order.product_name, 'num_items': order.quantity, 'content_ids': [str(order.product_id)]}
+                )
+            except Exception:
+                pass
+
     return OrderStatusResponse(
         order_number=order.order_number,
         payment_status=order.payment_status,
@@ -285,15 +306,9 @@ def check_order_status(order_number: str, db: Session = Depends(get_db)):
 def auto_verify_payment(req: AutoVerifyPaymentRequest, db: Session = Depends(get_db)):
     order = db.query(Order).filter(Order.order_number == req.order_number).first()
     if not order:
-        return VerifyPaymentResponse(
-            success=True,
-            message='Payment received and verified automatically. Order confirmed!',
-            order_number=req.order_number,
-            order_status='CONFIRMED',
-            amount_paid=1.0,
-            product_name='Pulse Sonic Pro ANC Earbuds',
-            variant='Standard',
-            delivery_estimate='2-3 business days'
+        raise HTTPException(
+            status_code=400,
+            detail='Order session not found. Please initiate checkout again.'
         )
 
     if order.payment_status == 'PAID' and order.order_status == 'CONFIRMED':
@@ -308,31 +323,48 @@ def auto_verify_payment(req: AutoVerifyPaymentRequest, db: Session = Depends(get
             delivery_estimate='2-3 business days'
         )
 
-    order.payment_status = 'PAID'
-    order.order_status = 'CONFIRMED'
-    order.upi_utr = f'AUTO_{int(datetime.utcnow().timestamp())}_{uuid.uuid4().hex[:6].upper()}'
-    db.commit()
-
-    try:
-        meta_capi.send_event(
-            event_name='Purchase',
-            event_id=order.event_id or f'pur_{order.order_number}',
-            user_data={'email': order.email, 'phone': order.phone, 'first_name': order.customer_name.split()[0] if order.customer_name else '', 'city': order.city, 'state': order.state, 'pincode': order.pincode},
-            custom_data={'currency': 'INR', 'value': order.total_amount, 'order_id': order.order_number, 'content_name': order.product_name, 'num_items': order.quantity, 'content_ids': [str(order.product_id)]}
+    # Query live Paytm Merchant Ledger
+    paytm_res = paytm_service.check_order_transaction_status(req.order_number)
+    if paytm_res.get('is_paid'):
+        order.payment_status = 'PAID'
+        order.order_status = 'CONFIRMED'
+        order.upi_utr = paytm_res.get('txn_id', '')
+        db.commit()
+        return VerifyPaymentResponse(
+            success=True,
+            message='Payment verified and confirmed from Paytm merchant ledger!',
+            order_number=order.order_number,
+            order_status=order.order_status,
+            amount_paid=order.total_amount,
+            product_name=order.product_name,
+            variant=order.variant,
+            delivery_estimate='2-3 business days'
         )
-    except Exception:
-        pass
 
-    return VerifyPaymentResponse(
-        success=True,
-        message='Payment received and verified automatically. Order confirmed!',
-        order_number=order.order_number,
-        order_status=order.order_status,
-        amount_paid=order.total_amount,
-        product_name=order.product_name,
-        variant=order.variant,
-        delivery_estimate='2-3 business days'
+    # If uncredited, reject order completion
+    raise HTTPException(
+        status_code=400,
+        detail='Payment Not Detected Yet: We have not received the ₹1.00 credit confirmation in the merchant account. Please approve the payment in your UPI app (Google Pay / PhonePe / Paytm) and retry.'
     )
+
+@router.post('/paytm-webhook')
+async def paytm_webhook_endpoint(request: Request, db: Session = Depends(get_db)):
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    order_id = body.get('ORDERID') or body.get('orderId') or body.get('order_number')
+    status = body.get('STATUS') or body.get('status') or body.get('resultStatus')
+    txn_id = body.get('TXNID') or body.get('txnId') or body.get('utr', '')
+    if order_id and status in ['TXN_SUCCESS', 'SUCCESS', 'PAID']:
+        order = db.query(Order).filter(Order.order_number == order_id).first()
+        if order and order.payment_status != 'PAID':
+            order.payment_status = 'PAID'
+            order.order_status = 'CONFIRMED'
+            order.upi_utr = txn_id
+            db.commit()
+            return {'status': 'success', 'order_status': 'PAID'}
+    return {'status': 'received'}
 
 @router.post('/verify-upi', response_model=VerifyPaymentResponse)
 def verify_upi_payment(req: VerifyUpiRequest, db: Session = Depends(get_db)):

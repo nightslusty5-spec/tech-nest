@@ -17,6 +17,8 @@ class Settings:
     RAZORPAY_KEY_SECRET: str = os.getenv('RAZORPAY_KEY_SECRET', 'pulse_secret_sandbox_signature_key')
     PAYTM_UPI_ID: str = os.getenv('PAYTM_UPI_ID', 'paytm.pulse@paytm')
     PAYTM_MERCHANT_NAME: str = os.getenv('PAYTM_MERCHANT_NAME', 'PULSE AUDIO Official')
+    PAYTM_MID: str = os.getenv('PAYTM_MID', '')
+    PAYTM_MERCHANT_KEY: str = os.getenv('PAYTM_MERCHANT_KEY', '')
     META_PIXEL_ID: str = os.getenv('META_PIXEL_ID', '102938475610293')
     META_CAPI_ACCESS_TOKEN: str = os.getenv('META_CAPI_ACCESS_TOKEN', '')
     META_TEST_EVENT_CODE: str = os.getenv('META_TEST_EVENT_CODE', '')
