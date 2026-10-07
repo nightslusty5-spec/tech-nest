@@ -326,13 +326,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var orderNum = orderData.order_number;
 
     function buildUpiLinks(targetUpiId) {
-      var baseParams = 'pa=' + encodeURIComponent(targetUpiId) + 
-                       '&pn=' + encodeURIComponent(merchant) + 
-                       '&mc=5732' + 
-                       '&mode=02' + 
-                       '&purpose=00' + 
+      var cleanPa = targetUpiId.trim();
+      var cleanPn = (merchant || 'PULSE AUDIO').replace(/[^a-zA-Z0-9 ]/g, '').trim();
+      var cleanTn = 'PulseOrder';
+      var baseParams = 'pa=' + encodeURIComponent(cleanPa) + 
+                       '&pn=' + encodeURIComponent(cleanPn) + 
                        '&am=' + amountFormatted + 
-                       '&cu=INR&tn=' + encodeURIComponent('Order_' + orderNum);
+                       '&cu=INR' + 
+                       '&tn=' + encodeURIComponent(cleanTn);
       return {
         generic: 'upi://pay?' + baseParams,
         gpay: 'tez://upi/pay?' + baseParams,
