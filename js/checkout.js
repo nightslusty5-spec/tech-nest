@@ -1,4 +1,4 @@
-// PULSE AUDIO - Dynamic Checkout & Payment Gateway Engine
+// PULSE AUDIO - Dynamic Checkout & Paytm Dynamic QR Gateway Engine
 document.addEventListener('DOMContentLoaded', function() {
   var urlParams = new URLSearchParams(window.location.search);
   var sessionItem = JSON.parse(sessionStorage.getItem('pulse_checkout_product') || 'null');
@@ -16,6 +16,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var appliedCoupon = 'PREPAID100';
   var couponDiscount = 100.0;
+
+  var paymentConfig = {
+    upi_id: 'paytm.pulse@paytm',
+    merchant_name: 'PULSE AUDIO Official',
+    store_name: 'PULSE AUDIO'
+  };
+
+  // Fetch dynamic payment config from backend
+  fetch('/api/checkout/payment-config')
+    .then(function(r) { return r.json(); })
+    .then(function(cfg) {
+      if (cfg && cfg.upi_id) {
+        paymentConfig = cfg;
+      }
+    })
+    .catch(function() {});
 
   // If slug was passed in URL, fetch dynamic product details to sync price
   var slugFromUrl = urlParams.get('product') || checkoutState.productSlug;
@@ -265,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       })
       .then(function(orderData) {
-        openRazorpay(orderData);
+        openPaytmGateway(orderData);
       })
       .catch(function(err) {
         console.error(err);
@@ -276,100 +292,176 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  function openRazorpay(orderData) {
-    if (window.Razorpay && !orderData.is_mock) {
-      var opt = {
-        key: orderData.key_id,
-        amount: Math.round(orderData.amount * 100),
-        currency: 'INR',
-        name: 'PULSE AUDIO Official',
-        description: checkoutState.productName,
-        order_id: orderData.razorpay_order_id,
-        prefill: {
-          name: orderData.customer_name,
-          email: orderData.email,
-          contact: orderData.phone
-        },
-        theme: { color: '#4f46e5' },
-        handler: function(resp) {
-          verifyPayment(orderData.order_number, resp.razorpay_order_id, resp.razorpay_payment_id, resp.razorpay_signature);
-        },
-        modal: {
-          ondismiss: function() {
-            btn.disabled = false;
-            updateSummary();
-          }
-        }
-      };
-      var rzp = new window.Razorpay(opt);
-      rzp.open();
-    } else {
-      renderSandbox(orderData);
-    }
-  }
-
-  function renderSandbox(orderData) {
-    var existingModal = document.getElementById('sandboxModal');
+  // Paytm Dynamic UPI QR Gateway Modal
+  function openPaytmGateway(orderData) {
+    var existingModal = document.getElementById('paytmModal');
     if (existingModal) existingModal.remove();
 
+    var upiId = paymentConfig.upi_id || 'paytm.pulse@paytm';
+    var merchant = paymentConfig.merchant_name || 'PULSE AUDIO Official';
+    var amountFormatted = Number(orderData.amount).toFixed(2);
+    var orderNum = orderData.order_number;
+
+    // Official UPI Payment URI Specification
+    var upiUri = 'upi://pay?pa=' + encodeURIComponent(upiId) + 
+                 '&pn=' + encodeURIComponent(merchant) + 
+                 '&am=' + amountFormatted + 
+                 '&cu=INR&tn=' + encodeURIComponent('Order_' + orderNum);
+
+    var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=' + encodeURIComponent(upiUri);
+
     var modal = document.createElement('div');
-    modal.id = 'sandboxModal';
-    modal.className = 'sandbox-modal-backdrop';
+    modal.id = 'paytmModal';
+    modal.className = 'paytm-modal-backdrop';
     modal.innerHTML = `
-      <div class="sandbox-modal-card">
-        <div class="sandbox-badge">RAZORPAY SECURE GATEWAY (SANDBOX SIMULATOR)</div>
-        <div class="sandbox-brand">
-          <span class="brand-bolt">⚡</span>
-          <strong>PULSE AUDIO Official Store</strong>
+      <div class="paytm-modal-card">
+        <!-- Header -->
+        <div class="paytm-modal-header">
+          <div class="paytm-brand-col">
+            <span class="paytm-logo-badge">Paytm</span>
+            <div>
+              <div class="paytm-brand-title">Dynamic UPI QR Gateway</div>
+              <small style="opacity: 0.85; font-size: 11px;">100% Secure &amp; Instant Verification</small>
+            </div>
+          </div>
+          <div class="paytm-timer-pill" id="qrTimerPill">⏱️ 09:59</div>
         </div>
-        <p class="sandbox-order-no">Order Reference: <strong>${orderData.order_number}</strong></p>
-        <div class="sandbox-payable-row">
-          <span>Amount Payable (Post Discount):</span>
-          <strong class="payable-amt">₹${orderData.amount.toLocaleString('en-IN')}</strong>
+
+        <!-- Body -->
+        <div class="paytm-modal-body">
+          <div class="paytm-amount-card">
+            <div class="lbl">Exact Amount Payable</div>
+            <div class="amt">₹${Number(orderData.amount).toLocaleString('en-IN')}</div>
+          </div>
+
+          <!-- QR Code Box -->
+          <div class="paytm-qr-container">
+            <img src="${qrApiUrl}" class="paytm-qr-img" alt="Paytm Dynamic UPI QR Code">
+            <div class="paytm-qr-caption">
+              <span>⚡ Scan with <strong>GPay, PhonePe, Paytm</strong> or Any UPI App</span>
+            </div>
+          </div>
+
+          <!-- UPI ID Box with Copy Action -->
+          <div class="paytm-upi-box">
+            <div>
+              <small style="color: #64748b; display: block; font-size: 10px;">MERCHANT UPI ID</small>
+              <span class="paytm-upi-val" id="merchantUpiVal">${escapeHtml(upiId)}</span>
+            </div>
+            <button type="button" class="btn-copy-upi" id="btnCopyUpiId">COPY</button>
+          </div>
+
+          <!-- Mobile 1-Tap App Links (For Mobile Users) -->
+          <div class="paytm-apps-row">
+            <a href="${upiUri}" class="btn-upi-app" target="_blank">
+              <span class="app-icon">🟢</span>
+              <span>Google Pay</span>
+            </a>
+            <a href="${upiUri}" class="btn-upi-app" target="_blank">
+              <span class="app-icon">🟣</span>
+              <span>PhonePe</span>
+            </a>
+            <a href="${upiUri}" class="btn-upi-app" target="_blank">
+              <span class="app-icon">🔵</span>
+              <span>Paytm UPI</span>
+            </a>
+          </div>
+
+          <!-- UTR Verification Form -->
+          <div class="paytm-utr-section">
+            <label for="upiUtrInput">Enter 12-Digit UPI Ref / UTR Number <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="upiUtrInput" class="paytm-utr-input" placeholder="e.g. 427819283741" maxlength="22">
+            <button type="button" id="btnConfirmUpiOrder" class="btn-confirm-upi-order">
+              <span>✓</span> CONFIRM PAYMENT &amp; PLACE ORDER
+            </button>
+            <button type="button" id="btnSimulateFast" style="margin-top: 8px; width: 100%; background: transparent; border: 1px dashed #0284c7; color: #0284c7; border-radius: 8px; padding: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">
+              ⚡ Instant 1-Click Demo Payment Simulation
+            </button>
+          </div>
         </div>
-        <div class="sandbox-methods">
-          <div class="method-chip active">UPI (GPay / PhonePe / Paytm)</div>
-          <div class="method-chip">Cards & Netbanking</div>
+
+        <!-- Footer -->
+        <div class="paytm-modal-footer">
+          <span class="sec-note">🔒 256-Bit SSL Encrypted</span>
+          <button type="button" class="paytm-close-link" id="paytmCloseBtn">Cancel Transaction</button>
         </div>
-        <button id="mockSuccessBtn" class="sandbox-pay-btn">
-          <span>🔒</span> SIMULATE SUCCESSFUL PAYMENT
-        </button>
-        <button id="mockCloseBtn" class="sandbox-cancel-btn">Cancel Transaction</button>
       </div>
     `;
     document.body.appendChild(modal);
 
-    document.getElementById('mockSuccessBtn').onclick = function() {
-      this.textContent = 'Verifying Server Signature (HMAC-SHA256)...';
-      this.disabled = true;
-      verifyPayment(orderData.order_number, orderData.razorpay_order_id, 'pay_mock_' + Date.now(), 'sandbox_success_sig');
+    // Copy UPI ID button
+    document.getElementById('btnCopyUpiId').onclick = function() {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(upiId);
+      }
+      this.textContent = 'COPIED!';
+      var self = this;
+      setTimeout(function() { self.textContent = 'COPY'; }, 2000);
     };
 
-    document.getElementById('mockCloseBtn').onclick = function() {
+    // Countdown timer
+    var timeLeft = 600;
+    var timerInterval = setInterval(function() {
+      timeLeft--;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        var pill = document.getElementById('qrTimerPill');
+        if (pill) pill.textContent = 'Expired';
+      } else {
+        var mins = Math.floor(timeLeft / 60);
+        var secs = timeLeft % 60;
+        var pill = document.getElementById('qrTimerPill');
+        if (pill) pill.textContent = '⏱️ ' + (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+      }
+    }, 1000);
+
+    // Confirm UTR Order Button
+    document.getElementById('btnConfirmUpiOrder').onclick = function() {
+      var utrVal = document.getElementById('upiUtrInput').value.trim();
+      if (!utrVal || utrVal.length < 6) {
+        alert('Please enter your 12-digit UPI Reference / UTR Number from your payment receipt.');
+        return;
+      }
+      clearInterval(timerInterval);
+      this.disabled = true;
+      this.innerHTML = '<span>⏳</span> Verifying Transaction...';
+      submitUpiUtr(orderData.order_number, utrVal);
+    };
+
+    // Instant simulation button
+    document.getElementById('btnSimulateFast').onclick = function() {
+      var mockUtr = 'UTR' + Math.floor(100000000000 + Math.random() * 900000000000);
+      clearInterval(timerInterval);
+      this.textContent = 'Processing Payment...';
+      submitUpiUtr(orderData.order_number, mockUtr);
+    };
+
+    // Close button
+    document.getElementById('paytmCloseBtn').onclick = function() {
+      clearInterval(timerInterval);
       modal.remove();
       btn.disabled = false;
       updateSummary();
     };
   }
 
-  function verifyPayment(ordNum, rzpOrdId, rzpPayId, rzpSig) {
+  function submitUpiUtr(ordNum, utr) {
     var name = (document.getElementById('custName') && document.getElementById('custName').value) ? document.getElementById('custName').value : 'Aditya Sharma';
     var fallbackOrderInfo = {
       order_number: ordNum,
       customer_name: name,
       order_status: 'CONFIRMED',
-      payment: { status: 'PAID' },
-      delivery_estimate: '3-5 business days'
+      payment: { status: 'PAID', utr: utr },
+      delivery_estimate: '2-3 business days'
     };
 
-    fetch('/api/checkout/verify-payment', {
+    fetch('/api/checkout/verify-upi', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         order_number: ordNum,
-        razorpay_order_id: rzpOrdId,
-        razorpay_payment_id: rzpPayId,
-        razorpay_signature: rzpSig
+        utr_number: utr,
+        payment_method: 'paytm_upi'
       })
     })
     .then(function(r) {
@@ -383,11 +475,21 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .then(function(data) {
       sessionStorage.setItem('pulse_last_order', JSON.stringify(data || fallbackOrderInfo));
-      window.location.href = '/success.html?order=' + encodeURIComponent(ordNum);
+      window.location.href = '/success.html?order=' + encodeURIComponent(ordNum) + '&utr=' + encodeURIComponent(utr);
     })
     .catch(function() {
       sessionStorage.setItem('pulse_last_order', JSON.stringify(fallbackOrderInfo));
-      window.location.href = '/success.html?order=' + encodeURIComponent(ordNum);
+      window.location.href = '/success.html?order=' + encodeURIComponent(ordNum) + '&utr=' + encodeURIComponent(utr);
     });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 });

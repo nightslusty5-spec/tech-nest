@@ -803,3 +803,274 @@
   color: var(--text-sub);
   cursor: pointer;
 }
+
+/* ================= PAYTM DYNAMIC QR GATEWAY MODAL ================= */
+.paytm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeInModal 0.25s ease;
+  overflow-y: auto;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.paytm-modal-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  margin: auto;
+}
+
+.paytm-modal-header {
+  background: linear-gradient(135deg, #002970 0%, #00b9f5 100%);
+  color: #ffffff;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.paytm-brand-col {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.paytm-logo-badge {
+  background: #ffffff;
+  color: #002970;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.paytm-brand-title {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.paytm-timer-pill {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.paytm-modal-body {
+  padding: 20px;
+  text-align: center;
+}
+
+.paytm-amount-card {
+  background: #f0f9ff;
+  border: 1.5px dashed #0284c7;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.paytm-amount-card .lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0369a1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.paytm-amount-card .amt {
+  font-size: 26px;
+  font-weight: 900;
+  color: #0c4a6e;
+  margin-top: 2px;
+}
+
+.paytm-qr-container {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 14px;
+  display: inline-block;
+  margin-bottom: 14px;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.paytm-qr-img {
+  width: 200px;
+  height: 200px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+}
+
+.paytm-qr-caption {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.paytm-upi-box {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.paytm-upi-val {
+  font-weight: 700;
+  color: #1e293b;
+  word-break: break-all;
+}
+
+.btn-copy-upi {
+  background: #00b9f5;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Mobile Intent App Buttons */
+.paytm-apps-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.btn-upi-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  text-decoration: none;
+  color: #1e293b;
+  font-size: 11px;
+  font-weight: 800;
+  transition: all 0.2s;
+}
+
+.btn-upi-app:hover {
+  border-color: #00b9f5;
+  background: #f0f9ff;
+  transform: translateY(-2px);
+}
+
+.btn-upi-app .app-icon {
+  font-size: 20px;
+}
+
+/* UTR Confirmation Form */
+.paytm-utr-section {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+  text-align: left;
+}
+
+.paytm-utr-section label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #334155;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.paytm-utr-input {
+  width: 100%;
+  height: 46px;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.paytm-utr-input:focus {
+  border-color: #00b9f5;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 185, 245, 0.2);
+}
+
+.btn-confirm-upi-order {
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+.btn-confirm-upi-order:hover {
+  background: #047857;
+}
+
+.paytm-modal-footer {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.paytm-modal-footer .sec-note {
+  font-size: 11px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.paytm-close-link {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}

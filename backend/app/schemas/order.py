@@ -68,3 +68,14 @@ class VerifyPaymentResponse(BaseModel):
     product_name: str
     variant: str
     delivery_estimate: str
+
+class PaymentConfigResponse(BaseModel):
+    upi_id: str
+    merchant_name: str
+    store_name: str
+    currency: str = 'INR'
+
+class VerifyUpiRequest(BaseModel):
+    order_number: str
+    utr_number: str
+    payment_method: Optional[str] = 'paytm_upi'

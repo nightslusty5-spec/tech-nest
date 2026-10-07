@@ -28,6 +28,7 @@ class Order(Base):
     razorpay_order_id = Column(String(100), index=True, nullable=True)
     razorpay_payment_id = Column(String(100), nullable=True)
     razorpay_signature = Column(String(255), nullable=True)
+    upi_utr = Column(String(50), nullable=True)
     event_id = Column(String(100), nullable=True)
     payment_status = Column(String(50), default='PENDING_PAYMENT')
     order_status = Column(String(50), default='PROCESSING')
