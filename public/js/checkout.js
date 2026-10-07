@@ -317,9 +317,12 @@ document.addEventListener('DOMContentLoaded', function() {
     var amountFormatted = Number(orderData.amount).toFixed(2);
     var orderNum = orderData.order_number;
 
-    // Direct UPI Deep-Link URI Schemes with Exact Amount Pre-Filled
+    // Direct UPI Deep-Link URI Schemes with Exact Amount Pre-Filled & NPCI Merchant Mode
     var baseParams = 'pa=' + encodeURIComponent(upiId) + 
                      '&pn=' + encodeURIComponent(merchant) + 
+                     '&mc=5732' + 
+                     '&mode=02' + 
+                     '&purpose=00' + 
                      '&am=' + amountFormatted + 
                      '&cu=INR&tn=' + encodeURIComponent('Order_' + orderNum);
 
