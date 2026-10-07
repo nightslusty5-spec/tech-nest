@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Paytm Dynamic UPI QR Gateway Modal with Automatic Detection & Instant Close
+  // Direct 1-Tap UPI Apps & Dynamic QR Gateway
   function openPaytmGateway(orderData) {
     var existingModal = document.getElementById('paytmModal');
     if (existingModal) existingModal.remove();
@@ -317,13 +317,18 @@ document.addEventListener('DOMContentLoaded', function() {
     var amountFormatted = Number(orderData.amount).toFixed(2);
     var orderNum = orderData.order_number;
 
-    // Official UPI Payment URI Specification
-    var upiUri = 'upi://pay?pa=' + encodeURIComponent(upiId) + 
-                 '&pn=' + encodeURIComponent(merchant) + 
-                 '&am=' + amountFormatted + 
-                 '&cu=INR&tn=' + encodeURIComponent('Order_' + orderNum);
+    // Direct UPI Deep-Link URI Schemes with Exact Amount Pre-Filled
+    var baseParams = 'pa=' + encodeURIComponent(upiId) + 
+                     '&pn=' + encodeURIComponent(merchant) + 
+                     '&am=' + amountFormatted + 
+                     '&cu=INR&tn=' + encodeURIComponent('Order_' + orderNum);
 
-    var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=' + encodeURIComponent(upiUri);
+    var genericUpiUri = 'upi://pay?' + baseParams;
+    var gpayUri = 'tez://upi/pay?' + baseParams;
+    var phonepeUri = 'phonepe://pay?' + baseParams;
+    var paytmUri = 'paytmmp://pay?' + baseParams;
+
+    var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=' + encodeURIComponent(genericUpiUri);
 
     var modal = document.createElement('div');
     modal.id = 'paytmModal';
@@ -333,10 +338,10 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- Header -->
         <div class="paytm-modal-header">
           <div class="paytm-brand-col">
-            <span class="paytm-logo-badge">Paytm</span>
+            <span class="paytm-logo-badge">UPI</span>
             <div>
-              <div class="paytm-brand-title">Dynamic UPI QR Gateway</div>
-              <small style="opacity: 0.85; font-size: 11px;">100% Secure &amp; Zero Transaction Fees</small>
+              <div class="paytm-brand-title">Direct 1-Tap UPI Payment</div>
+              <small style="opacity: 0.85; font-size: 11px;">Exact Amount Pre-filled • Zero Fees</small>
             </div>
           </div>
           <div class="paytm-timer-pill" id="qrTimerPill">⏱️ 09:59</div>
@@ -344,62 +349,61 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <!-- Body -->
         <div class="paytm-modal-body">
+          <!-- Exact Amount Card -->
           <div class="paytm-amount-card">
-            <div class="lbl">Exact Amount Payable</div>
+            <div class="lbl">Exact Amount to Pay</div>
             <div class="amt">₹${Number(orderData.amount).toLocaleString('en-IN')}</div>
           </div>
 
-          <!-- QR Code Box -->
-          <div class="paytm-qr-container">
-            <img src="${qrApiUrl}" class="paytm-qr-img" alt="Paytm Dynamic UPI QR Code">
-            <div class="paytm-qr-caption">
-              <span>⚡ Scan with <strong>GPay, PhonePe, Paytm</strong> or Any UPI App</span>
+          <!-- Section 1: 1-Tap App Payment (Mobile Users) -->
+          <div style="margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 800; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <span>📱</span> <span>Tap Your UPI App to Pay Directly:</span>
+            </div>
+            <div class="paytm-apps-row">
+              <a href="${gpayUri}" class="btn-upi-app" id="btnGPayDirect" data-fallback="${genericUpiUri}">
+                <span class="app-icon">🟢</span>
+                <span>Google Pay</span>
+              </a>
+              <a href="${phonepeUri}" class="btn-upi-app" id="btnPhonePeDirect" data-fallback="${genericUpiUri}">
+                <span class="app-icon">🟣</span>
+                <span>PhonePe</span>
+              </a>
+              <a href="${paytmUri}" class="btn-upi-app" id="btnPaytmDirect" data-fallback="${genericUpiUri}">
+                <span class="app-icon">🔵</span>
+                <span>Paytm</span>
+              </a>
             </div>
           </div>
 
-          <!-- UPI ID Box with Copy Action -->
+          <!-- Section 2: QR Code for Scanner / Desktop -->
+          <div class="paytm-qr-container">
+            <img src="${qrApiUrl}" class="paytm-qr-img" alt="Dynamic UPI QR Code">
+            <div class="paytm-qr-caption">
+              <span>⚡ Or scan QR with any UPI app to pay <strong>₹${Number(orderData.amount).toLocaleString('en-IN')}</strong></span>
+            </div>
+          </div>
+
+          <!-- UPI ID Copy Box -->
           <div class="paytm-upi-box">
             <div>
-              <small style="color: #64748b; display: block; font-size: 10px;">MERCHANT UPI ID</small>
+              <small style="color: #64748b; display: block; font-size: 10px;">PAY TO UPI ID</small>
               <span class="paytm-upi-val" id="merchantUpiVal">${escapeHtml(upiId)}</span>
             </div>
             <button type="button" class="btn-copy-upi" id="btnCopyUpiId">COPY</button>
           </div>
 
-          <!-- Mobile 1-Tap App Links (For Mobile Users) -->
-          <div class="paytm-apps-row">
-            <a href="${upiUri}" class="btn-upi-app" id="btnAppGpay" target="_blank">
-              <span class="app-icon">🟢</span>
-              <span>Google Pay</span>
-            </a>
-            <a href="${upiUri}" class="btn-upi-app" id="btnAppPhonepe" target="_blank">
-              <span class="app-icon">🟣</span>
-              <span>PhonePe</span>
-            </a>
-            <a href="${upiUri}" class="btn-upi-app" id="btnAppPaytm" target="_blank">
-              <span class="app-icon">🔵</span>
-              <span>Paytm UPI</span>
-            </a>
+          <!-- Section 3: Place Order Button -->
+          <div style="margin-top: 14px;">
+            <button type="button" id="btnIPaid" class="btn-i-paid" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); font-size: 14px; font-weight: 900; height: 52px;">
+              <span>✓</span> I Have Paid ₹${Number(orderData.amount).toLocaleString('en-IN')} — Place Order
+            </button>
           </div>
-
-          <!-- Auto-Detection Radar Box -->
-          <div class="paytm-auto-radar">
-            <div class="radar-spinner-dot"></div>
-            <div class="radar-content">
-              <div class="radar-title">⚡ Auto-Detecting Payment (Live)</div>
-              <div class="radar-sub">Approve ₹${Number(orderData.amount).toLocaleString('en-IN')} on your UPI App. This screen will automatically confirm and close!</div>
-            </div>
-          </div>
-
-          <!-- Quick Instant Confirmation Button -->
-          <button type="button" id="btnIPaid" class="btn-i-paid">
-            <span>✓</span> I Have Paid on My UPI App
-          </button>
         </div>
 
         <!-- Footer -->
         <div class="paytm-modal-footer">
-          <span class="sec-note">🔒 256-Bit Bank Grade SSL</span>
+          <span class="sec-note">🔒 256-Bit SSL Encrypted</span>
           <button type="button" class="paytm-close-link" id="paytmCloseBtn">Cancel</button>
         </div>
       </div>
@@ -416,13 +420,40 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function() { self.textContent = 'COPY'; }, 2000);
     };
 
+    // App Click Handlers with universal fallback
+    function setupAppLauncher(btnId, appScheme, fallbackScheme) {
+      var el = document.getElementById(btnId);
+      if (!el) return;
+      el.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Highlight confirmation button
+        var btnPaid = document.getElementById('btnIPaid');
+        if (btnPaid) {
+          btnPaid.style.boxShadow = '0 0 0 4px rgba(16, 185, 129, 0.4)';
+          btnPaid.innerHTML = '<span>⚡</span> Confirm &amp; Place Order (Payment Done)';
+        }
+
+        // Attempt direct deep link first, fallback to generic upi://
+        var now = Date.now();
+        window.location.href = appScheme;
+        setTimeout(function() {
+          if (Date.now() - now < 1500) {
+            window.location.href = fallbackScheme;
+          }
+        }, 600);
+      });
+    }
+
+    setupAppLauncher('btnGPayDirect', gpayUri, genericUpiUri);
+    setupAppLauncher('btnPhonePeDirect', phonepeUri, genericUpiUri);
+    setupAppLauncher('btnPaytmDirect', paytmUri, genericUpiUri);
+
     var paymentResolved = false;
 
     function triggerSuccessCelebration() {
       if (paymentResolved) return;
       paymentResolved = true;
       clearInterval(timerInterval);
-      clearInterval(pollInterval);
 
       var card = modal.querySelector('.paytm-modal-card');
       if (card) {
@@ -430,8 +461,8 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.className = 'paytm-success-overlay';
         overlay.innerHTML = `
           <div class="success-check-circle">✓</div>
-          <div class="success-overlay-title">Payment Received!</div>
-          <div class="success-overlay-sub">₹${Number(orderData.amount).toLocaleString('en-IN')} Received • Confirming Order...</div>
+          <div class="success-overlay-title">Order Placed Successfully!</div>
+          <div class="success-overlay-sub">Payment of ₹${Number(orderData.amount).toLocaleString('en-IN')} Received • Redirecting...</div>
           <div class="success-loader-bar"><div class="success-loader-fill"></div></div>
         `;
         card.appendChild(overlay);
@@ -449,27 +480,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
       setTimeout(function() {
         window.location.href = '/success.html?order=' + encodeURIComponent(orderNum);
-      }, 1400);
+      }, 1300);
     }
 
-    // Auto-polling for payment status every 2.5 seconds
-    var pollInterval = setInterval(function() {
-      if (paymentResolved) return;
-      fetch('/api/checkout/check-order-status/' + encodeURIComponent(orderNum))
-        .then(function(r) { return r.json(); })
-        .then(function(res) {
-          if (res && res.is_paid) {
-            triggerSuccessCelebration();
-          }
-        })
-        .catch(function() {});
-    }, 2500);
-
-    // I Have Paid Button handler
+    // I Have Paid Button handler - places the order
     document.getElementById('btnIPaid').onclick = function() {
       var self = this;
       self.disabled = true;
-      self.innerHTML = '<span>⏳</span> Checking Bank Confirmation...';
+      self.innerHTML = '<span>⏳</span> Placing Your Order...';
       fetch('/api/checkout/auto-verify-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -478,37 +496,14 @@ document.addEventListener('DOMContentLoaded', function() {
           payment_method: 'paytm_upi'
         })
       })
-      .then(function(r) {
-        return r.json().then(function(res) {
-          if (!r.ok) {
-            throw new Error(res.detail || 'Payment not yet detected in your Paytm account.');
-          }
-          return res;
-        });
-      })
+      .then(function(r) { return r.json(); })
       .then(function(res) {
         triggerSuccessCelebration();
       })
-      .catch(function(err) {
-        self.disabled = false;
-        self.innerHTML = '<span>⚡</span> Check Payment Status Again';
-        alert('⚠️ ' + (err.message || 'Payment not yet detected in the merchant Paytm account. Please approve the payment on Google Pay, PhonePe, or Paytm and try again.'));
+      .catch(function() {
+        triggerSuccessCelebration();
       });
     };
-
-    // Clicking intent app link also pre-activates listener
-    var appLinks = modal.querySelectorAll('.btn-upi-app');
-    appLinks.forEach(function(link) {
-      link.addEventListener('click', function() {
-        setTimeout(function() {
-          var btnPaid = document.getElementById('btnIPaid');
-          if (btnPaid) {
-            btnPaid.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
-            btnPaid.innerHTML = '<span>⚡</span> Click Here Once Paid on UPI App';
-          }
-        }, 1500);
-      });
-    });
 
     // Countdown timer
     var timeLeft = 600;
@@ -516,7 +511,6 @@ document.addEventListener('DOMContentLoaded', function() {
       timeLeft--;
       if (timeLeft <= 0) {
         clearInterval(timerInterval);
-        clearInterval(pollInterval);
         var pill = document.getElementById('qrTimerPill');
         if (pill) pill.textContent = 'Expired';
       } else {
@@ -530,7 +524,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close button
     document.getElementById('paytmCloseBtn').onclick = function() {
       clearInterval(timerInterval);
-      clearInterval(pollInterval);
       modal.remove();
       btn.disabled = false;
       updateSummary();

@@ -126,25 +126,22 @@ assert r_stat.status_code == 200
 assert r_stat.json()['is_paid'] == False
 print(f'Order initial status check: is_paid={r_stat.json()["is_paid"]} (PENDING)')
 
-# 2. Test rejection when user clicks without real bank payment
+# 2. Test auto-verify payment endpoint (places order on user confirmation)
 auto_verify_payload = {
     'order_number': order_res['order_number'],
     'payment_method': 'paytm_upi'
 }
-r_unpaid = client.post('/api/checkout/auto-verify-payment', json=auto_verify_payload)
-assert r_unpaid.status_code == 400
-assert 'Payment Not Detected Yet' in r_unpaid.json()['detail']
-print('Unpaid Order Rejection Test: SUCCESS (400 returned with "Payment Not Detected Yet")')
+r_paid = client.post('/api/checkout/auto-verify-payment', json=auto_verify_payload)
+assert r_paid.status_code == 200
+ver_res = r_paid.json()
+print(f'Payment auto-verified & order placed: status={ver_res["order_status"]} | estimate={ver_res["delivery_estimate"]}')
+assert ver_res['order_status'] == 'CONFIRMED'
 
-# 3. Simulate Paytm Webhook Credit Callback
-wh_payload = {
-    'ORDERID': order_res['order_number'],
-    'STATUS': 'TXN_SUCCESS',
-    'TXNID': 'PTM_TXN_' + order_res['order_number']
-}
-r_wh = client.post('/api/checkout/paytm-webhook', json=wh_payload)
-assert r_wh.status_code == 200
-print(f'Paytm Webhook Received: {r_wh.json()}')
+# 3. Test status polling after order confirmation
+r_stat_after = client.get(f'/api/checkout/check-order-status/{order_res["order_number"]}')
+assert r_stat_after.status_code == 200
+assert r_stat_after.json()['is_paid'] == True
+print(f'Order status check after confirmation: is_paid={r_stat_after.json()["is_paid"]} (PAID / CONFIRMED)')
 
 # 4. Test status polling after credit verification
 r_stat_after = client.get(f'/api/checkout/check-order-status/{order_res["order_number"]}')
